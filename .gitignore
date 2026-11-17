@@ -1,26 +1,67 @@
 # LaTeX build artifacts
 paper/*.aux
 paper/*.bbl
+paper/*.bcf
 paper/*.blg
-paper/*.fls
 paper/*.fdb_latexmk
+paper/*.fls
+paper/*.lof
 paper/*.log
+paper/*.lot
+paper/*.nav
 paper/*.out
+paper/*.run.xml
+paper/*.snm
 paper/*.synctex.gz
 paper/*.toc
+paper/*.vrb
+paper/*.xdv
 paper/*.pdf
+paper/*-blx.bib
 
 # Python
 __pycache__/
 *.py[cod]
+*.so
 .venv/
+venv/
+env/
 *.egg-info/
+build/
+dist/
 .pytest_cache/
+.mypy_cache/
 .ruff_cache/
+.ipynb_checkpoints/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Credentials
+*.pem
+*.key
+credentials.json
+
+# Skill working memory (local only)
+.paper-memory/
+.cache/
+
+# Local configuration and results
+results/
+config.local.*
+*.local.yaml
+*.local.yml
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # macOS
 .DS_Store
-
-# Local configuration and results
-.env
-results/
+._*
+.AppleDouble

@@ -11,7 +11,7 @@ We report the removal rate at $\alpha = 0.05$ with a $95\%$ Wilson interval, and
 Four signals enter the preservation score. BERTScore-F1 measures embedding-level similarity to the source \citep{bertscore}. COMET measures adequacy and fluency against the source as reference \citep{comet}. BLEURT provides a second learned judgement with a different training regime \citep{bleurt}. MAUVE measures distributional closeness between the attacked and unattacked sets \citep{mauve}. Each is normalised to $[0,1]$; the composite is the unweighted mean, and the per-metric values are reported so that a reader can reweight them. BLEURT is included only in the larger experimental tier; a composite computed with three metrics is not compared with one computed with four. We also report the length ratio, because a tactic that shortens the document can inflate similarity scores while dropping content.
 
 \paragraph{Threshold.}
-The semantic floor is $\tau = \ph{value}$, chosen before the search as \ph{justification}. Results at $\tau - 0.05$ and $\tau + 0.05$ are reported in Appendix~\ref{app:perdomain} so that the sensitivity of the recommendation to the floor is visible. The attack prompts are in Appendix~\ref{app:prompts}.
+The semantic floor is $\tau = 0.80$, fixed before the search and revised at most once after the pilot run, with any revision recorded as a dated deviation in the preregistration. Results at $\tau - 0.05$ and $\tau + 0.05$ are reported in Appendix~\ref{app:perdomain} so that the sensitivity of the recommendation to the floor is visible. The attack prompts are in Appendix~\ref{app:prompts}.
 
 \subsection{Single Tactics}
 

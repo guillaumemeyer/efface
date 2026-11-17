@@ -6,30 +6,32 @@ Table~\ref{tab:hyper} records the settings used for the main sweep. The configur
 \begin{table}[h]
 \centering
 \small
-\caption{Per-tactic settings. Intensity is normalised where the implementation allows it.}
+\caption{Per-tactic settings. Intensity is normalised where the implementation allows it. Discrete tactics carry a single setting.}
 \label{tab:hyper}
 \begin{tabular}{@{}llll@{}}
 \toprule
 Tactic & Intensity parameter & Default & Swept values \\
 \midrule
-Instruction paraphrase      & Target rewrite ratio      & \ph{value} & \ph{values} \\
-Discourse paraphrase        & Lexical diversity         & \ph{value} & \ph{values} \\
-Masked-LM infilling         & Fraction of spans masked  & \ph{value} & \ph{values} \\
-Style normalisation         & Rule set                  & \ph{value} & \ph{values} \\
-Document rewrite            & Chunk size and context    & \ph{value} & \ph{values} \\
-Single-pivot back-translation & Pivot language          & \ph{value} & \ph{values} \\
-Multi-hop back-translation  & Number of pivots          & \ph{value} & \ph{values} \\
-Cross-lingual generation    & Pivot language            & \ph{value} & \ph{values} \\
-Synonym substitution        & Fraction of words         & \ph{value} & \ph{values} \\
-Random word edits           & Edit rate                 & \ph{value} & \ph{values} \\
-Typo and noise injection    & Character error rate      & \ph{value} & \ph{values} \\
-Non-origin regeneration     & Decoding settings         & \ph{value} & \ph{values} \\
+Instruction paraphrase      & Target rewrite ratio      & 0.7 & 0.3, 0.6, 1.0 \\
+Discourse paraphrase        & Target rewrite ratio      & 0.7 & 0.3, 0.6, 1.0 \\
+Masked-LM infilling         & Fraction of spans masked  & 0.15 & 0.05, 0.15, 0.3 \\
+Style normalisation         & Rule set                  & Full & Full \\
+Document rewrite            & Rewrite strength          & 0.8 & 0.5, 0.8, 1.0 \\
+Single-pivot back-translation & Pivot language          & French & French \\
+Multi-hop back-translation  & Pivot chain               & French, German & French, German \\
+Cross-lingual generation    & Pivot language            & French & French \\
+Synonym substitution        & Fraction of content words & 0.2 & 0.1, 0.2, 0.4 \\
+Random word edits           & Fraction of positions     & 0.1 & 0.05, 0.1, 0.2 \\
+Typo and noise injection    & Character error rate      & 0.05 & 0.01, 0.05, 0.1 \\
+Non-origin regeneration     & Full regeneration         & Full & Full \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+Seven tactics have a continuous intensity and are swept at three points; the five discrete tactics are evaluated at one setting. The intensity names a request to the attacker model or a parameter of the transformation; it is not an achieved edit rate measured on the output.
+
 \paragraph{Search settings.}
-Beam width $B = \ph{value}$; semantic tolerance $\epsilon = \ph{value}$; minimum detectable difference for pruning $\ph{value}$; search split fraction $\ph{value}$; repetitions per stochastic tactic $\ph{value}$.
+Beam width $B = 8$ and maximum depth $3$, giving $1{,}884$ ordered chains before intensities are considered. Semantic floor $\tau = 0.80$ with tolerance $\epsilon = 0.02$; minimum detectable difference $0.05$ absolute removal rate; search split fraction $0.6$ with seed $20261117$; three stochastic repetitions per document; Holm correction within each depth; per-document $\alpha = 0.05$ and corpus operating point at $1\%$ false-positive rate. The main sweep and the chain search use each tactic's default intensity; the depth-one intensity sweep uses the values in Table~\ref{tab:hyper}.
 
 \paragraph{Detector settings.}
-Scheme parameters are those used at generation: \ph{list}. Detection threshold $\alpha = 0.05$ per document, and the corpus operating point at $1\%$ false-positive rate.
+Scheme parameters are those used at generation: the MarkLLM SynthID configuration recorded in the run manifest, with temperature $0.7$, top-$p$ $0.9$, and $400$ new tokens per document. The scheme's logits processor requires top-$k \le 0$, so decoding uses top-$p$ sampling only. Detection threshold $\alpha = 0.05$ per document, and the corpus operating point at $1\%$ false-positive rate.

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "efface"
+version = "0.1.0"
+description = "Constrained search over meaning-preserving text-watermark removal chains"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Guillaume Meyer", email = "guillaume.meyer@outlook.com" }]
+keywords = ["watermarking", "synthid", "paraphrase", "evaluation", "reproducibility"]
+dependencies = [
+  "PyYAML>=6.0.2,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9",
+  "ruff>=0.8,<1",
+]
+metrics = [
+  "bert-score>=0.3.13,<1",
+  "comet>=2.2,<3",
+  "mauve-text>=0.4,<1",
+  "sentence-transformers>=3.3,<6",
+  "torch>=2.5,<3",
+  "transformers>=4.46,<6",
+]
+watermark = [
+  "torch>=2.5,<3",
+  "transformers>=4.46,<6",
+]
+
+[project.scripts]
+efface = "efface.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["efface"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

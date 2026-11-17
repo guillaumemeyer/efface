@@ -1,9 +1,10 @@
-\section{Prompts and Rating Protocol}
+\section{Attack Prompts}
 \label{app:prompts}
 
-\subsection{Attack Prompts}
-
-The paraphrase and style tactics use the templates below. Placeholders in angle brackets are filled from the configuration file. The templates are recorded here because a paraphrase attack is only reproducible if its instruction is.
+The paraphrase, translation, and regeneration tactics use the templates below.
+Placeholders in angle brackets are filled from the configuration file. The
+templates are recorded here because a paraphrase attack is only reproducible if
+its instruction is.
 
 \begin{quote}
 \small
@@ -31,9 +32,12 @@ The paraphrase and style tactics use the templates below. Placeholders in angle 
 
 \begin{quote}
 \small
-\textbf{Cross-lingual generation.} \texttt{<prompt translated into pivot language>}
+\textbf{Cross-lingual generation.} (1) Translate the passage into \texttt{<pivot language>}. (2) Rewrite the translation in \texttt{<pivot language>}, preserving every factual claim. (3) Translate the result back into English. Return only the final English passage.\\
+\textbf{Passage.} \texttt{<source>}
 \end{quote}
 
-\subsection{Human Rating Protocol}
-
-Raters see the source and the attacked document side by side, in random order, without knowing which chain produced the document. They answer two questions on a five-point scale: whether the attacked document says the same thing as the source, and whether it reads fluently. A third question asks them to mark any changed fact, number, or attribution. Each document is rated by \ph{number} raters, and agreement is reported as Krippendorff's $\alpha$. Raters are paid \ph{rate}.
+\begin{quote}
+\small
+\textbf{Regeneration.} Write a new passage from the instruction below. Keep the same topic, audience, and approximate length. Return only the new passage.\\
+\textbf{Instruction.} \texttt{<prompt or source>}
+\end{quote}

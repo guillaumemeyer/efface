@@ -1,0 +1,35 @@
+# Attacker roles. Model identifiers and prices are filled in Week 2 after the
+# provider and its terms of service are confirmed (docs/decisions.md, O4).
+provider:
+  kind: openai-compatible
+  base_url_env: REWRITE_BASE_URL
+  api_key_env: REWRITE_API_KEY
+  temperature: 0.9
+
+roles:
+  paraphrase:
+    model: null
+    used_by:
+      - instruction_paraphrase
+      - discourse_paraphrase
+      - style_normalisation
+      - document_rewrite
+  translation:
+    model: null
+    used_by:
+      - backtranslate_single
+      - backtranslate_multi
+      - crosslingual_generation
+  infill:
+    model: roberta-large
+    local: true
+    used_by:
+      - mlm_infill
+  synonyms:
+    model: null
+    used_by:
+      - synonym_substitution
+  regeneration:
+    model: null
+    used_by:
+      - regeneration

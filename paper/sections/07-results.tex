@@ -8,13 +8,10 @@
 We report the removal rate at $\alpha = 0.05$ with a $95\%$ Wilson interval, and the corpus-level true-positive rate at a $1\%$ false-positive rate. The first is the per-document question, the second is the detector-tuning question, and they can disagree: a chain can push most documents below the per-document threshold while leaving a detectable residual in the pooled distribution. Reporting both makes the disagreement visible.
 
 \paragraph{Preservation.}
-Four signals enter the preservation score. BERTScore-F1 measures embedding-level similarity to the source \citep{bertscore}. COMET measures adequacy and fluency against the source as reference \citep{comet}. BLEURT provides a second learned judgement with a different training regime \citep{bleurt}. MAUVE measures distributional closeness between the attacked and unattacked sets \citep{mauve}. Each is normalised to $[0,1]$; the composite is the unweighted mean, and the per-metric values are reported so that a reader can reweight them. We also report the length ratio, because a tactic that shortens the document can inflate similarity scores while dropping content.
-
-\paragraph{Human ratings.}
-A stratified sample of \ph{number} documents is rated on a five-point scale for meaning preservation and fluency by \ph{number} raters, with agreement reported as Krippendorff's $\alpha$. The sample is drawn across domains, chains, and removal outcomes, so that the automatic scores can be checked where they matter. The rating protocol is in Appendix~\ref{app:prompts}.
+Four signals enter the preservation score. BERTScore-F1 measures embedding-level similarity to the source \citep{bertscore}. COMET measures adequacy and fluency against the source as reference \citep{comet}. BLEURT provides a second learned judgement with a different training regime \citep{bleurt}. MAUVE measures distributional closeness between the attacked and unattacked sets \citep{mauve}. Each is normalised to $[0,1]$; the composite is the unweighted mean, and the per-metric values are reported so that a reader can reweight them. BLEURT is included only in the larger experimental tier; a composite computed with three metrics is not compared with one computed with four. We also report the length ratio, because a tactic that shortens the document can inflate similarity scores while dropping content.
 
 \paragraph{Threshold.}
-The semantic floor is $\tau = \ph{value}$, chosen before the search as \ph{justification}. Results at $\tau - 0.05$ and $\tau + 0.05$ are reported in Appendix~\ref{app:perdomain} so that the sensitivity of the recommendation to the floor is visible.
+The semantic floor is $\tau = \ph{value}$, chosen before the search as \ph{justification}. Results at $\tau - 0.05$ and $\tau + 0.05$ are reported in Appendix~\ref{app:perdomain} so that the sensitivity of the recommendation to the floor is visible. The attack prompts are in Appendix~\ref{app:prompts}.
 
 \subsection{Single Tactics}
 
@@ -28,7 +25,7 @@ Table~\ref{tab:singles} reports every tactic applied once. The control row is th
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.0cm}ccccc@{}}
 \toprule
-Tactic & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & BERTScore $\uparrow$ & COMET $\uparrow$ & Length ratio \\
+Tactic & Removal $\uparrow$ & Residual TPR@1\%FPR $\downarrow$ & BERTScore $\uparrow$ & COMET $\uparrow$ & Length ratio \\
 \midrule
 Instruction paraphrase   & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
 Discourse paraphrase     & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
@@ -59,7 +56,7 @@ Tables~\ref{tab:pairs} and~\ref{tab:triples} report the best chains at each dept
 \label{tab:pairs}
 \begin{tabular}{@{}clcccc@{}}
 \toprule
-Rank & Chain & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ & Length ratio \\
+Rank & Chain & Removal $\uparrow$ & Residual TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ & Length ratio \\
 \midrule
 1 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
 2 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
@@ -77,7 +74,7 @@ Rank & Chain & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ &
 \label{tab:triples}
 \begin{tabular}{@{}clcccc@{}}
 \toprule
-Rank & Chain & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ & Length ratio \\
+Rank & Chain & Removal $\uparrow$ & Residual TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ & Length ratio \\
 \midrule
 1 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
 2 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\

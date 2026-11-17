@@ -14,9 +14,11 @@ This repository holds the paper and the code for **EFFACE**, a study of how much
 
 > **Draft, preprint in preparation.** The paper source is in [`paper/`](paper/). Every number in the paper and in this README is a `TODO` placeholder until the runs land. The code interface shown below is the planned one; no package has been released yet. Results will be replaced with held-out numbers, and a DOI will be added to the citation block.
 
+Working documents: [`PLAN.md`](PLAN.md) for the task list, [`docs/decisions.md`](docs/decisions.md) for the locked design choices, and [`PREREGISTRATION.md`](PREREGISTRATION.md) for the frozen analysis protocol.
+
 ## Abstract
 
-Text watermarking schemes of the SynthID-Text class embed a statistical signal in the sampling process, so the mark lives in the choice of tokens. Prior work measures how well such marks survive individual transformations: paraphrasing, back-translation, token substitution, regeneration. Each study picks its own operating point, and few report what the transformation costs in meaning. This paper poses the joint question. Given a semantic floor, which single transformation, or which ordered chain of at most three, removes the watermark most reliably? We formalise the problem as a constrained search over an attack catalogue, measure removal against a same-config detector at a per-document threshold and at a corpus-level true-positive rate, and measure preservation with complementary automatic metrics alongside human ratings. We release the catalogue, the search procedure, and the evaluation harness.
+Text watermarking schemes of the SynthID-Text class embed a statistical signal in the sampling process, so the mark lives in the choice of tokens. Prior work measures how well such marks survive individual transformations: paraphrasing, back-translation, token substitution, regeneration. Each study picks its own operating point, and few report what the transformation costs in meaning. This paper poses the joint question. Given a semantic floor, which single transformation, or which ordered chain of at most three, removes the watermark most reliably? We formalise the problem as a constrained search over an attack catalogue, measure removal against a same-config detector at a per-document threshold and at a corpus-level true-positive rate, and measure preservation with complementary automatic metrics, reported per metric and as a fixed composite. We release the catalogue, the search procedure, and the evaluation harness.
 
 ## The paper
 
@@ -56,7 +58,7 @@ The object of study is a **statistical, sampling-time text watermark** of the Sy
 - removal tactics that change the token stream: paraphrase, back-translation, token edits, regeneration;
 - ordered chains of up to three such tactics;
 - removal measured at a per-document threshold and at a corpus operating point;
-- preservation measured with embedding similarity, learned quality metrics, distributional distance, and human ratings.
+- preservation measured with embedding similarity, learned quality metrics, and distributional distance.
 
 Out of scope:
 
@@ -88,7 +90,7 @@ efface/
 │   ├── refs.bib
 │   └── Makefile
 ├── efface/                    Python package (planned)
-│   ├── watermark/             generation through the SynthID-Text reference implementation
+│   ├── watermark/             generation through the MarkLLM SynthID reimplementation
 │   ├── attacks/               one module per tactic in the catalogue
 │   ├── chains/                composition, ordering, intensity
 │   ├── detect/                MarkLLM adapter and scoring
@@ -129,7 +131,7 @@ Configure the models. Keys live in the environment; `.env` is ignored by git.
 
 | Variable | Purpose |
 | --- | --- |
-| `GEMINI_API_KEY` | Hosted generator calls |
+| `REWRITE_API_KEY` | Paraphrase, translation, and regeneration calls |
 | `REWRITE_API_KEY` | Paraphrase, translation, and regeneration calls |
 | `REWRITE_BASE_URL` | Endpoint for the attacker model |
 | `MARKLLM_DIR` | Path to the MarkLLM checkout used as the detector |
@@ -162,7 +164,7 @@ The catalogue is the unit of comparison. Each tactic has one interface, one inte
 | --- | --- | --- | --- | --- | --- |
 | Instruction paraphrase | Paraphrase | Sentence wording, kept close to the source | Low | Kirchenbauer et al. 2024 | `efface/attacks/paraphrase_instruct.py` |
 | Discourse paraphrase | Paraphrase | Paragraph structure, sentence boundaries, wording | Medium | Krishna et al. 2023 | `efface/attacks/paraphrase_discourse.py` |
-| Masked-LM infilling | Paraphrase | Individual spans, local context only | Low | Zhang et al. 2024 | `efface/attacks/infill_mlm.py` |
+| Masked-LM infilling | Paraphrase | Individual spans, local context only | Low | Cheng et al. 2025 | `efface/attacks/infill_mlm.py` |
 | Style normalisation | Paraphrase | Contractions, casing, punctuation, filler, stock transitions | Low | Piet et al. 2025 | `efface/attacks/humanize_style.py` |
 | Document rewrite | Paraphrase | Whole document, fresh context per chunk | High | Krishna et al. 2023 | `efface/attacks/rewrite_document.py` |
 | Single-pivot back-translation | Back-translation | Token stream, through one pivot language | Medium | Piet et al. 2025 | `efface/attacks/backtranslate.py` |
@@ -198,10 +200,10 @@ Generators and schemes:
 
 | Row | Model | Scheme | Sampling distribution available |
 | --- | --- | --- | --- |
-| G1 | TODO: open-weight model and version | SynthID-Text reference implementation | Yes |
-| G2 | TODO: hosted model and version | TODO: second scheme, labelled separately | No |
+| G1 | `facebook/opt-1.3b` | MarkLLM SynthID reimplementation | Yes |
+| G2 | `Qwen/Qwen2.5-1.5B-Instruct` | MarkLLM SynthID reimplementation | Yes |
 
-The G2 row is kept separate because a hosted model does not expose logits, which the SynthID-Text implementation needs. The paper states what the row is a control for. **TODO: confirm the role of the hosted row before the first run.**
+Both rows are open-weight models, so the sampling distribution is available and the same SynthID reimplementation applies to each. MarkLLM's SynthID is a research reimplementation with its own keying. Google retired text-watermark detection on its API in August 2026, so the study has no vendor tier and makes no claim about production SynthID-Text detection.
 
 Attackers, all from families other than the generator's:
 
@@ -237,8 +239,7 @@ Preservation:
 - **COMET** for adequacy and fluency against the source;
 - **BLEURT** as a second learned judgement;
 - **MAUVE** for distributional closeness between attacked and unattacked sets;
-- **Length ratio**, because a tactic that shortens a document can inflate similarity scores;
-- **Human ratings** on a stratified sample, with Krippendorff's α reported.
+- **Length ratio**, because a tactic that shortens a document can inflate similarity scores.
 
 The composite preservation score is the unweighted mean of the four automatic metrics, normalised to `[0, 1]`. Per-metric values are reported so the composite can be reweighted. The semantic floor `τ` is fixed before the search and reported with every recommendation, along with results at `τ ± 0.05`.
 
@@ -314,7 +315,7 @@ Answers to the Machine Learning Reproducibility Checklist v2.0 (Pineau et al., 2
 ## Limitations
 
 - **The detector is a same-config oracle.** It is configured with the scheme parameters and key family used at generation, which makes the study reproducible and bounds it. A vendor detector may aggregate differently, and nothing here certifies what a deployed checker reports.
-- **Semantic metrics are proxies.** They miss some factual corruptions and can be gamed by a tactic that keeps the opening intact. The human sample is the check, and it is small.
+- **Semantic metrics are proxies.** They miss some factual corruptions and can be gamed by a tactic that keeps the opening intact. A specific failure mode is best read from the per-metric table rather than the composite.
 - **Composition compounds loss.** A chain at the floor on average can still fail on individual documents; the per-document distribution is reported alongside the mean.
 - **Length effects.** Detector power grows with tokens, and removal rates do not transfer to short passages.
 - **Model drift.** Hosted models change without notice; a committed record of model identifiers and dates is the only mitigation.
@@ -331,7 +332,7 @@ Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); GitHub renders a
 
 ```bibtex
 @article{efface2026,
-  title   = {{EFFACE}: Finding the Optimal Meaning-Preserving Attack Chain against {SynthID-Text} Watermarks},
+  title   = {{EFFACE}: Finding the Most Effective Meaning-Preserving Attack Chain against {SynthID-Text-Class} Watermarks},
   author  = {Meyer, Guillaume},
   journal = {arXiv preprint arXiv:TODO},
   year    = {2026},
@@ -356,6 +357,7 @@ Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); GitHub renders a
 - He, Z., Zhou, B., Hao, H., Liu, A., Wang, X., Tu, Z., Zhang, Z., Wang, R. *Can Watermarks Survive Translation? On the Cross-lingual Consistency of Text Watermark for Large Language Models.* ACL 2024. [arXiv:2402.14007](https://arxiv.org/abs/2402.14007)
 - Piet, J., Sitawarin, C., Fang, V., Mu, N., Wagner, D. *Mark My Words: Analyzing and Evaluating Language Model Watermarks.* IEEE SaTML 2025. [arXiv:2312.00273](https://arxiv.org/abs/2312.00273)
 - Zhang, H., Edelman, B. L., Francati, D., Venturi, D., Ateniese, G., Barak, B. *Watermarks in the Sand: Impossibility of Strong Watermarking for Generative Models.* ICML 2024. [arXiv:2311.04378](https://arxiv.org/abs/2311.04378)
+- Cheng, Y., Guo, H., Li, Y., Sigal, L. *Revealing Weaknesses in Text Watermarking Through Self-Information Rewrite Attacks.* ICML 2025. [arXiv:2505.05190](https://arxiv.org/abs/2505.05190)
 - Sadasivan, V. S., Kumar, A., Balasubramanian, S., Wang, W., Feizi, S. *Can AI-Generated Text be Reliably Detected?* TMLR (2024). [arXiv:2303.11156](https://arxiv.org/abs/2303.11156)
 - Jovanović, N., Staab, R., Vechev, M. *Watermark Stealing in Large Language Models.* ICML 2024. [arXiv:2402.19361](https://arxiv.org/abs/2402.19361)
 
@@ -377,7 +379,6 @@ External projects the study depends on or compares against. Each is governed by 
 
 | Project | Role | Link |
 | --- | --- | --- |
-| SynthID-Text reference implementation | Generates the G1 watermark | [google-deepmind/synthid-text](https://github.com/google-deepmind/synthid-text) |
 | MarkLLM | Reference schemes and the same-config detector | [THU-BPM/MarkLLM](https://github.com/THU-BPM/MarkLLM) |
 | MarkMyWords | Benchmark tasks and tamper-resistance comparisons | [wagner-group/MarkMyWords](https://github.com/wagner-group/MarkMyWords) |
 | DIPPER | Discourse paraphraser used for the paraphrase family | [martiansideofthemoon/ai-detection-paraphrases](https://github.com/martiansideofthemoon/ai-detection-paraphrases) |

@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software or the accompanying paper, please cite it as below."
-title: "EFFACE: Finding the Optimal Meaning-Preserving Attack Chain against SynthID-Text Watermarks"
+title: "EFFACE: Finding the Most Effective Meaning-Preserving Attack Chain against SynthID-Text-Class Watermarks"
 abstract: >-
   A study of how much of a SynthID-Text-style statistical text watermark survives
   meaning-preserving rewriting, and of which single tactic or ordered chain of up
@@ -27,7 +27,7 @@ authors:
     affiliation: "TODO"
 preferred-citation:
   type: article
-  title: "EFFACE: Finding the Optimal Meaning-Preserving Attack Chain against SynthID-Text Watermarks"
+  title: "EFFACE: Finding the Most Effective Meaning-Preserving Attack Chain against SynthID-Text-Class Watermarks"
   authors:
     - family-names: "Meyer"
       given-names: "Guillaume"

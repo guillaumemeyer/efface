@@ -1,0 +1,20 @@
+# Generator rows. Both rows are open-weight models; a hosted row was removed
+# because it exposes no logits and the vendor detector was retired in Aug 2026.
+rows:
+  g1:
+    model: facebook/opt-1.3b
+    family: opt
+    scheme: markllm-synthid
+    max_new_tokens: 400
+    temperature: 0.7
+    top_p: 0.9
+    keys: [3, 42, 1234]
+  g2:
+    model: Qwen/Qwen2.5-1.5B-Instruct
+    family: qwen
+    scheme: markllm-synthid
+    max_new_tokens: 400
+    temperature: 0.7
+    top_p: 0.9
+    keys: [3, 42, 1234]
+    status: provisional_until_w2_1

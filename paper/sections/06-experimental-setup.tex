@@ -2,7 +2,7 @@
 \label{sec:setup}
 
 \paragraph{Generators and schemes.}
-Table~\ref{tab:generators} lists the generators. The open-weight row carries the SynthID-Text scheme through the published reference implementation, which requires access to the sampling distribution. The hosted row is included as a second, separately labelled scheme, with the caveat that a hosted model does not expose logits and therefore cannot host the SynthID-Text implementation directly. \ph{Confirm the role of the hosted row: control scheme, or text produced under an open-weight model and then attributed to the hosted row.}
+Table~\ref{tab:generators} lists the generators. Both rows are open-weight models, so the sampling distribution is available and the same SynthID reimplementation can be applied to each. The G1 row uses \texttt{facebook/opt-1.3b}, the default model of the MarkLLM SynthID configuration. The G2 row uses \texttt{Qwen/Qwen2.5-1.5B-Instruct}, from a different family. Neither row is hosted: a hosted API exposes no logits, and Google retired text-watermark detection on its API in August 2026. The detector is MarkLLM's SynthID reimplementation, a research implementation with its own keying, and every removal number is relative to it.
 
 \begin{table}[t]
 \centering
@@ -13,8 +13,8 @@ Table~\ref{tab:generators} lists the generators. The open-weight row carries the
 \toprule
 Row & Model & Scheme & Logits \\
 \midrule
-G1 & \ph{open-weight model and version} & SynthID-Text reference implementation & Yes \\
-G2 & \ph{hosted model and version} & \ph{scheme name}, labelled separately & No \\
+G1 & \texttt{facebook/opt-1.3b} & MarkLLM SynthID reimplementation & Yes \\
+G2 & \texttt{Qwen/Qwen2.5-1.5B-Instruct} & MarkLLM SynthID reimplementation & Yes \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -70,4 +70,4 @@ Each document is watermarked under $L = 3$ independent keys drawn from the schem
 Detection uses the SynthID scheme implementation in MarkLLM \citep{markllm}, configured with the same parameters used at generation. This is a same-config oracle: it detects the scheme it was given, under the key family it was given. It does not certify what a vendor detector would report, and we make no such claim. Section~\ref{sec:limitations} states the consequences.
 
 \paragraph{Compute.}
-All runs complete on \ph{hardware description} in \ph{wall-clock time}. The hosted-model calls account for \ph{share} of the cost, and the detector passes for \ph{share}. Appendix~\ref{app:hyper} lists the per-tactic settings, and the configuration files in \texttt{configs/} are the authoritative record.
+All runs complete on \ph{hardware description} in \ph{wall-clock time}. The attacker-model calls account for \ph{share} of the cost, and the detector passes for \ph{share}. Appendix~\ref{app:hyper} lists the per-tactic settings, and the configuration files in \texttt{configs/} are the authoritative record.

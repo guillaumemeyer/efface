@@ -1,0 +1,22 @@
+# Preservation metrics. BLEURT is Tier B only; see docs/decisions.md D6.
+metrics:
+  bertscore:
+    tier: A
+    model: roberta-large
+    normalize: identity
+  comet:
+    tier: A
+    model: wmt22-comet-da
+    normalize: clip_0_1
+  mauve:
+    tier: A
+    normalize: identity
+  bleurt:
+    tier: B
+    model: BLEURT-20
+    normalize: shift_and_clip
+  length_ratio:
+    tier: A
+    in_composite: false
+
+composite: unweighted_mean

@@ -1,0 +1,26 @@
+EFFACE
+Copyright (c) 2026 Guillaume Meyer
+
+This project includes code adapted from:
+
+  watermarks-remover
+  https://github.com/guillaumemeyer/watermarks-remover
+  MIT License, Copyright (c) 2026 Guillaume Meyer and contributors
+
+  Adapted modules: strategy parsing, document splitting, rank-based AUROC,
+  Pareto frontier selection, and cost accounting. The adapted code was
+  rewritten for this package; the original functions are named in the module
+  docstrings where the logic is close.
+
+External dependencies used by optional extras:
+
+  MarkLLM — https://github.com/THU-BPM/MarkLLM — Apache License 2.0
+  BERTScore — MIT License
+  COMET — Apache License 2.0
+  BLEURT — Apache License 2.0
+  MAUVE — Apache License 2.0
+  Hugging Face Transformers — Apache License 2.0
+  PyTorch — BSD 3-Clause License
+
+Model weights carry their own licenses. `facebook/opt-1.3b` is distributed
+under the OPT-175B license; `Qwen/Qwen2.5-1.5B-Instruct` is Apache-2.0.

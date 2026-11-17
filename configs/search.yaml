@@ -1,0 +1,18 @@
+# Search settings. These values are mirrored in PREREGISTRATION.md and may only
+# change through a dated deviation.
+beam_width: 8
+max_depth: 3
+semantic_floor: 0.80
+floor_tolerance: 0.02
+minimum_detectable_difference: 0.05
+split_fraction: 0.6
+split_seed: 20261117
+alpha: 0.05
+fpr: 0.01
+repetitions: 3
+min_document_tokens: 150
+multiplicity: holm
+
+cost:
+  api_cap_usd: 600
+  chars_per_token: 4.0

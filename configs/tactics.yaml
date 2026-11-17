@@ -1,0 +1,60 @@
+# Per-tactic default intensities and the values swept at depth one.
+# Intensity is normalised to (0, 1]. Units are named per tactic.
+tactics:
+  instruction_paraphrase:
+    default: 0.7
+    swept: [0.3, 0.6, 1.0]
+    unit: target_rewrite_ratio
+  discourse_paraphrase:
+    default: 0.7
+    swept: [0.3, 0.6, 1.0]
+    unit: target_rewrite_ratio
+  mlm_infill:
+    default: 0.15
+    swept: [0.05, 0.15, 0.3]
+    unit: fraction_of_spans
+  style_normalisation:
+    default: 1.0
+    swept: [1.0]
+    unit: rule_set
+  document_rewrite:
+    default: 0.8
+    swept: [0.5, 0.8, 1.0]
+    unit: rewrite_strength
+  backtranslate_single:
+    default: 1.0
+    swept: [1.0]
+    unit: pivot_count
+    pivots: [French]
+  backtranslate_multi:
+    default: 1.0
+    swept: [1.0]
+    unit: pivot_count
+    pivots: [French, German]
+  crosslingual_generation:
+    default: 1.0
+    swept: [1.0]
+    unit: pivot_count
+    pivots: [French]
+  synonym_substitution:
+    default: 0.2
+    swept: [0.1, 0.2, 0.4]
+    unit: fraction_of_content_words
+  random_edits:
+    default: 0.1
+    swept: [0.05, 0.1, 0.2]
+    unit: fraction_of_positions
+  typo_noise:
+    default: 0.05
+    swept: [0.01, 0.05, 0.1]
+    unit: character_error_rate
+  regeneration:
+    default: 1.0
+    swept: [1.0]
+    unit: full_regeneration
+
+control:
+  unicode_scrub:
+    default: 1.0
+    swept: [1.0]
+    unit: scrub_all_invisible

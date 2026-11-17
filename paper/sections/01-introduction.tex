@@ -1,0 +1,20 @@
+\section{Introduction}
+\label{sec:intro}
+
+Provenance marks for generated text are now deployed at scale. SynthID-Text, the scheme Google ships with Gemini, biases the sampling distribution at generation time and detects the bias later from the token sequence alone \citep{synthidtext}. The same design space contains green-list schemes that boost a keyed subset of the vocabulary \citep{kgw}, exponential and Gumbel variants that key the sampler noise \citep{kuditipudi}, and distortion-free constructions with formal guarantees \citep{christ}. What these schemes share is that the signal is spread thinly across every token: a mark is a statistical property of the whole passage, and each sentence carries only a small part of the evidence.
+
+That property makes removal a question of degree. Editing a heading, reordering paragraphs, or fixing a comma leaves the token-level signal almost untouched, as the reliability study of \citet{kgwreliability} shows. Removing a mark requires replacing a substantial share of the original word choices. Every replacement is also a change in meaning, tone, and specificity, and the change compounds when several transformations are applied in sequence. Practitioners therefore face a trade-off rather than a binary outcome, and the trade-off has not been mapped systematically.
+
+Existing evaluations each cover a slice of the space. The reliability study of \citet{kgwreliability} measures machine and human paraphrasing and copy-paste mixing. DIPPER establishes that a strong discourse-level paraphraser can strip detection while keeping meaning close \citep{dipper}. The cross-lingual study of \citet{cwra} shows that a pivot-language round trip removes marks that survive same-language paraphrase. MarkMyWords compares a suite of perturbations across schemes and reports quality alongside detectability \citep{markmywords}. None of these works searches over chains, and none reports which combination is optimal under a stated semantic budget.
+
+This paper closes that gap for the SynthID-Text class. We treat removal as a constrained optimisation: maximise the fraction of documents whose mark is no longer detectable, subject to a semantic-preservation score at or above a fixed floor, over single tactics and over ordered chains of up to three tactics. The constraint is what makes the question well posed. Without it, the strongest tactic is simply the most destructive one, which the impossibility results of \citet{sand} predict must exist.
+
+\paragraph{Contributions.}
+\begin{itemize}
+  \item A catalogue of thirteen rows: twelve removal tactics in four families and one control, each defined operationally, linked to the paper that introduced or evaluated it, and implemented behind one interface (\S\ref{sec:catalogue}).
+  \item A chain search that evaluates ordered compositions of up to three tactics under a semantic floor, with pruning that keeps the evaluation budget bounded (\S\ref{sec:search}).
+  \item An empirical frontier between removal and preservation across \ph{number} documents, \ph{number} generators, and \ph{number} domains, reported at two operating points (\S\ref{sec:results}).
+\end{itemize}
+
+\paragraph{Findings.}
+\ph{One paragraph once the runs finish: best single tactic, best pair, best triple, and the marginal value of the third step.}

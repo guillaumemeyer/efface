@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software or the accompanying paper, please cite it as below."
+title: "EFFACE: Finding the Optimal Meaning-Preserving Attack Chain against SynthID-Text Watermarks"
+abstract: >-
+  A study of how much of a SynthID-Text-style statistical text watermark survives
+  meaning-preserving rewriting, and of which single tactic or ordered chain of up
+  to three tactics removes the mark most reliably at a fixed semantic floor.
+version: 0.1.0
+date-released: 2026-11-17
+type: software
+license: MIT
+license-url: "https://github.com/guillaumemeyer/efface/blob/main/LICENSE"
+repository-code: "https://github.com/guillaumemeyer/efface"
+url: "https://github.com/guillaumemeyer/efface"
+keywords:
+  - text watermarking
+  - SynthID-Text
+  - watermark removal
+  - paraphrase
+  - back-translation
+  - evaluation
+  - reproducibility
+authors:
+  - family-names: "Meyer"
+    given-names: "Guillaume"
+    email: "guillaume.meyer@outlook.com"
+    affiliation: "TODO"
+preferred-citation:
+  type: article
+  title: "EFFACE: Finding the Optimal Meaning-Preserving Attack Chain against SynthID-Text Watermarks"
+  authors:
+    - family-names: "Meyer"
+      given-names: "Guillaume"
+      email: "guillaume.meyer@outlook.com"
+  year: 2026
+  journal: "arXiv preprint"
+  notes: "Preprint in preparation. arXiv identifier and DOI to be added on publication."

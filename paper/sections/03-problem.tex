@@ -1,0 +1,38 @@
+\section{Problem Formulation}
+\label{sec:problem}
+
+\paragraph{Setup.}
+A generator $G$ produces a document $x = (x_1, \dots, x_n)$ under a watermark key $k$ drawn from a keyspace $\mathcal{K}$. A detector $D$ takes a document and a key and returns a score whose null distribution is known under the unwatermarked hypothesis; we use the $p$-value $p_k(x)$ reported by the same-config test, so that small values indicate the presence of the mark. The detector is valid only against the scheme configuration and key family used at generation, a limitation we return to in \S\ref{sec:limitations}.
+
+\paragraph{Attack catalogue.}
+Let $\mathcal{A} = \{t_1, \dots, t_m\}$ be a catalogue of transformations. Each $t$ maps a document to a document, $t: \mathcal{X} \to \mathcal{X}$, and carries an intensity parameter $\theta_t$ that controls how much it changes. Table~\ref{tab:catalogue} lists the catalogue. A transformation may be stochastic, in which case $t(x)$ denotes a draw from its output distribution.
+
+\paragraph{Chains.}
+An attack chain is an ordered tuple $T = (t^{(1)}, \dots, t^{(K)})$ with $K \le 3$, applied left to right:
+\begin{equation}
+  x^{(0)} = x, \quad x^{(j)} = t^{(j)}\!\left(x^{(j-1)};\, \theta^{(j)}\right), \quad x^{(K)} = T(x).
+\end{equation}
+Order matters. A paraphrase followed by a round trip yields a different document than a round trip followed by a paraphrase, because each step conditions on the output of the previous one. We therefore treat chains as ordered and search over ordered tuples.
+
+\paragraph{Removal.}
+For a document $x$ and a key set $K = \{k_1, \dots, k_L\}$ of independent keys, define the document as removed when the mark fails to be detected under every key at level $\alpha$:
+\begin{equation}
+  \mathrm{removed}_\alpha(x) = \mathbf{1}\!\left[\min_{k \in K} p_k(x) > \alpha \right].
+\end{equation}
+Two summaries follow. The \emph{removal rate} is the mean of $\mathrm{removed}_\alpha$ over the evaluation set, reported with a Wilson interval. The \emph{corpus operating point} is the true-positive rate at a $1\%$ false-positive rate, computed by thresholding the detector score over the pooled set of attacked and unattacked documents. We report both, because a per-document threshold and a corpus-level rate answer different questions: the first asks whether this document still carries a mark, the second asks what a detector tuned for a fixed error budget would conclude.
+
+\paragraph{Preservation.}
+Let $S(x, T(x))$ be a semantic-preservation score in $[0,1]$, aggregated from the metrics in \S\ref{sec:metrics}. The floor $\tau$ is fixed before the search and reported with every result. A chain that falls below $\tau$ is inadmissible, whatever its removal rate.
+
+\paragraph{Objective.}
+The problem we study is
+\begin{equation}
+  T^\star = \operatorname*{arg\,max}_{T \in \mathcal{T}_{\le 3}} \; \mathbb{E}\left[\mathrm{removed}_\alpha(T(x))\right]
+  \quad \text{subject to} \quad
+  S(x, T(x)) \ge \tau \;\; \forall x ,
+  \label{eq:objective}
+\end{equation}
+where $\mathcal{T}_{\le 3}$ is the set of ordered chains of length at most three drawn from $\mathcal{A}$. In practice the constraint is enforced in expectation with a tolerance, and we report the constraint violation for every chain we recommend. Equation~\ref{eq:objective} makes the trade-off explicit and prevents the degenerate answer, which is to apply the most destructive transformation available.
+
+\paragraph{Why a floor is necessary.}
+\citet{sand} show that for any watermark occupying a small share of the space of high-quality responses, a quality-oracle random walk reaches an unmarked output. The construction needs a quality oracle and enough mixing steps, and it degrades quality to the extent that the walk is imperfect. A study that reports removal without a preservation constraint therefore measures the quality of the attacker's oracle as much as the robustness of the scheme. Fixing $\tau$ and reporting the frontier around it keeps the comparison meaningful.

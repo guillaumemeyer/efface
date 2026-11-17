@@ -1,0 +1,37 @@
+\section{Reproducibility Checklist}
+\label{app:checklist}
+
+We answer the Machine Learning Reproducibility Checklist v2.0 \citep{pineau}. Items marked \ph{TODO} are pending the final runs.
+
+\paragraph{Models and algorithms.}
+\begin{itemize}
+  \item Clear description of the mathematical setting: yes, \S\ref{sec:problem}.
+  \item Clear explanation of assumptions: yes, \S\ref{sec:problem} and \S\ref{sec:limitations}.
+  \item Complexity analysis: partial; wall-clock cost by tactic is reported in \S\ref{sec:setup}.
+\end{itemize}
+
+\paragraph{Datasets.}
+\begin{itemize}
+  \item Statistics and splits: yes, Table~\ref{tab:data}.
+  \item Exclusions and preprocessing: yes, \S\ref{sec:setup}.
+  \item Downloadable data: yes, \ph{link}.
+  \item Collection process for new data: not applicable; prompts are drawn from existing sets.
+\end{itemize}
+
+\paragraph{Shared code.}
+\begin{itemize}
+  \item Dependency specification: yes, \texttt{pyproject.toml} with pinned versions.
+  \item Evaluation code: yes, \texttt{eval/}.
+  \item Pretrained models: named in Table~\ref{tab:attackers}; open-weight checkpoints pinned by revision.
+  \item README with a table of results and the command that produces each: yes, repository README.
+\end{itemize}
+
+\paragraph{Experimental results.}
+\begin{itemize}
+  \item Hyperparameter ranges and selection method: yes, Appendix~\ref{app:hyper}.
+  \item Number of evaluation runs: yes, \S\ref{sec:setup}.
+  \item Definition of each reported statistic: yes, \S\ref{sec:metrics}.
+  \item Central tendency and variation: yes; Wilson intervals for rates, mean and standard deviation elsewhere.
+  \item Runtime or energy cost: \ph{TODO}.
+  \item Computing infrastructure: \ph{TODO}.
+\end{itemize}

@@ -1,0 +1,73 @@
+\section{Experimental Setup}
+\label{sec:setup}
+
+\paragraph{Generators and schemes.}
+Table~\ref{tab:generators} lists the generators. The open-weight row carries the SynthID-Text scheme through the published reference implementation, which requires access to the sampling distribution. The hosted row is included as a second, separately labelled scheme, with the caveat that a hosted model does not expose logits and therefore cannot host the SynthID-Text implementation directly. \ph{Confirm the role of the hosted row: control scheme, or text produced under an open-weight model and then attributed to the hosted row.}
+
+\begin{table}[t]
+\centering
+\small
+\caption{Generators and the scheme each row carries. Logits indicates whether the sampling distribution is available to the watermarking implementation.}
+\label{tab:generators}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Row & Model & Scheme & Logits \\
+\midrule
+G1 & \ph{open-weight model and version} & SynthID-Text reference implementation & Yes \\
+G2 & \ph{hosted model and version} & \ph{scheme name}, labelled separately & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Attackers.}
+Every tactic that calls a model uses a model from a family different from the generator, so that the attacker cannot reintroduce the generator's own mark. Table~\ref{tab:attackers} lists the models and their roles. The rule is applied per generator row: a chain that attacks a G1 document never uses a G1-family model, and the same holds for G2.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Models used by the attack tactics.}
+\label{tab:attackers}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}p{7.2cm}@{}}
+\toprule
+Role & Model & Used by \\
+\midrule
+Paraphrase and style     & \ph{model and version} & Instruction paraphrase, discourse paraphrase, style, document rewrite \\
+Translation              & \ph{model and version} & All back-translation tactics \\
+Masked infilling         & \ph{model and version} & Masked-LM infilling \\
+Synonym candidates       & \ph{model and version} & Synonym substitution \\
+Regeneration             & \ph{model and version} & Non-origin regeneration \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Data.}
+Table~\ref{tab:data} lists the prompt sets. Three domains cover distinct register and length profiles, and the MarkMyWords tasks are included so that at least part of the evaluation can be compared with published tamper-resistance numbers.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Prompt sets.}
+\label{tab:data}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Domain & Source & Prompts & Target length \\
+\midrule
+News writing        & \ph{source} & \ph{count} & \ph{tokens} \\
+Long-form question answering & \ph{source} & \ph{count} & \ph{tokens} \\
+Creative writing    & \ph{source} & \ph{count} & \ph{tokens} \\
+MarkMyWords tasks   & \citet{markmywords} & \ph{count} & \ph{tokens} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Generation settings.}
+Decoding uses \ph{temperature}, \ph{top-$p$}, and \ph{max new tokens} for every generator, with the same prompt set across rows. Each prompt is generated once per key. Documents below \ph{minimum length} tokens are discarded, because the detector's power depends on length and short documents would be removed trivially. We report the number discarded.
+
+\paragraph{Keys and repetitions.}
+Each document is watermarked under $L = 3$ independent keys drawn from the scheme's keyspace and never reused across runs. Detection is evaluated under the key used at generation. Where the tactic is stochastic, each document passes through the tactic \ph{number} times with different seeds, and the reported score is the mean. Seeds are fixed and recorded in the configuration files.
+
+\paragraph{Oracle.}
+Detection uses the SynthID scheme implementation in MarkLLM \citep{markllm}, configured with the same parameters used at generation. This is a same-config oracle: it detects the scheme it was given, under the key family it was given. It does not certify what a vendor detector would report, and we make no such claim. Section~\ref{sec:limitations} states the consequences.
+
+\paragraph{Compute.}
+All runs complete on \ph{hardware description} in \ph{wall-clock time}. The hosted-model calls account for \ph{share} of the cost, and the detector passes for \ph{share}. Appendix~\ref{app:hyper} lists the per-tactic settings, and the configuration files in \texttt{configs/} are the authoritative record.

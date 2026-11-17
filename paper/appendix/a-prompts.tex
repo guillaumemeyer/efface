@@ -1,0 +1,39 @@
+\section{Prompts and Rating Protocol}
+\label{app:prompts}
+
+\subsection{Attack Prompts}
+
+The paraphrase and style tactics use the templates below. Placeholders in angle brackets are filled from the configuration file. The templates are recorded here because a paraphrase attack is only reproducible if its instruction is.
+
+\begin{quote}
+\small
+\textbf{Instruction paraphrase.} Rewrite the following passage so that the meaning, entities, numbers, and order of ideas are preserved. Change the wording and sentence structure. Return only the rewritten passage.\\
+\textbf{Passage.} \texttt{<source>}
+\end{quote}
+
+\begin{quote}
+\small
+\textbf{Discourse paraphrase.} You are rewriting a passage from a longer document. Preserve every factual claim. You may reorder sentences and merge or split them. Return only the rewritten passage.\\
+\textbf{Context.} \texttt{<surrounding paragraphs>}\\
+\textbf{Passage.} \texttt{<source>}
+\end{quote}
+
+\begin{quote}
+\small
+\textbf{Style normalisation.} Rewrite the passage in a plain, human register: contractions where natural, no em dashes, no stock transitions, no filler. Preserve meaning and length. Return only the rewritten passage.\\
+\textbf{Passage.} \texttt{<source>}
+\end{quote}
+
+\begin{quote}
+\small
+\textbf{Back-translation control.} Translate the passage into \texttt{<pivot language>}. Return only the translation.
+\end{quote}
+
+\begin{quote}
+\small
+\textbf{Cross-lingual generation.} \texttt{<prompt translated into pivot language>}
+\end{quote}
+
+\subsection{Human Rating Protocol}
+
+Raters see the source and the attacked document side by side, in random order, without knowing which chain produced the document. They answer two questions on a five-point scale: whether the attacked document says the same thing as the source, and whether it reads fluently. A third question asks them to mark any changed fact, number, or attribution. Each document is rated by \ph{number} raters, and agreement is reported as Krippendorff's $\alpha$. Raters are paid \ph{rate}.

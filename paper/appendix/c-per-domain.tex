@@ -1,0 +1,46 @@
+\section{Additional Results}
+\label{app:perdomain}
+
+\subsection{Results by Length}
+
+Detector power depends on length, so we report the recommended chain by length bucket.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Removal and preservation by length bucket for the recommended chain.}
+\label{tab:length}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Bucket (tokens) & Documents & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ \\
+\midrule
+\ph{range} & \ph{count} & \ph{run} & \ph{run} & \ph{run} \\
+\ph{range} & \ph{count} & \ph{run} & \ph{run} & \ph{run} \\
+\ph{range} & \ph{count} & \ph{run} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Sensitivity to the Floor}
+
+The recommendation is computed at $\tau$, and we repeat it at $\tau - 0.05$ and $\tau + 0.05$ to show how much the choice of floor moves the answer.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Recommended chain at three semantic floors.}
+\label{tab:tau}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Floor & Recommended chain & Removal $\uparrow$ & COMET $\uparrow$ \\
+\midrule
+$\tau - 0.05$ & \ph{chain} & \ph{run} & \ph{run} \\
+$\tau$        & \ph{chain} & \ph{run} & \ph{run} \\
+$\tau + 0.05$ & \ph{chain} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Failure Cases}
+
+\ph{Short list of documents where a chain satisfied the floor in expectation but changed a fact, a number, or an attribution. Each entry names the source, the attacked text, and the change.}

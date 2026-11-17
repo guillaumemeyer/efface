@@ -1,0 +1,20 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{What a guarantee can mean.}
+The phrase \emph{removed to a good degree of guarantee} can describe three different claims, and the difference matters for how a result should be read. A \emph{statistical} claim says that the same-config test fails to reject the unwatermarked null at the chosen level, on this document, under this key. An \emph{operational} claim says that a detector tuned to a fixed false-positive rate no longer separates attacked from unattacked text. A \emph{scheme-independent} claim says that no detector for the scheme, present or future, could recover the mark. The third claim is not available for any tactic in our catalogue, and the impossibility result of \citet{sand} explains why: a mark that occupies a small share of the high-quality output space can be walked away from by any attacker with a quality oracle. Our results support the first two claims, and we state them in those terms.
+
+\paragraph{The value of composition.}
+\ph{One paragraph once the search finishes: does the best pair add removal over the best single, does the best triple add removal over the best pair, and at what preservation cost. State the marginal removal per point of preservation.}
+
+\paragraph{Order effects.}
+Because chains are ordered, the same two tactics can produce different outcomes in the two orders. We expect the asymmetry to follow from what each step leaves behind: a token edit applied before a paraphrase has its work partly undone only if the paraphraser reuses the original wording, while a paraphrase applied before a token edit leaves the edit as the final word. \ph{Report the measured asymmetry for the top pairs and say whether the direction is consistent across domains.}
+
+\paragraph{Comparison with prior work.}
+Reported removal rates in the literature are not directly comparable across papers, because scheme, length, detector threshold, and attacker model all differ. Our numbers agree in direction with \citet{kgwreliability} and \citet{dipper} on paraphrase, with \citet{cwra} on pivot round trips, and with \citet{markmywords} on the relative weakness of simple token edits. \ph{State the quantitative comparisons where the setups overlap, and the reason for any disagreement.}
+
+\paragraph{Practical reading.}
+For a practitioner who wants the strongest removal at a fixed fidelity cost, the recommendation is the frontier point in \S\ref{sec:results}. For a scheme designer, the useful quantity is the cost at which the frontier turns: the amount of rewriting needed to push detection below the operating point. \ph{Fill in the turning point and the corresponding per-document edit budget.}
+
+\paragraph{Threat model and scope.}
+The study assumes an attacker with black-box access to a generator and to open attack models, and with knowledge of the scheme class. It does not assume the key, a vendor detector, or an ability to query the detector during the attack. These assumptions are the common ones in the removal literature, and results obtained under them do not transfer automatically to an attacker who holds the key or who can iterate against a live detector.

@@ -1,0 +1,121 @@
+\section{Results}
+\label{sec:results}
+
+\subsection{Metrics and Decision Rule}
+\label{sec:metrics}
+
+\paragraph{Removal.}
+We report the removal rate at $\alpha = 0.05$ with a $95\%$ Wilson interval, and the corpus-level true-positive rate at a $1\%$ false-positive rate. The first is the per-document question, the second is the detector-tuning question, and they can disagree: a chain can push most documents below the per-document threshold while leaving a detectable residual in the pooled distribution. Reporting both makes the disagreement visible.
+
+\paragraph{Preservation.}
+Four signals enter the preservation score. BERTScore-F1 measures embedding-level similarity to the source \citep{bertscore}. COMET measures adequacy and fluency against the source as reference \citep{comet}. BLEURT provides a second learned judgement with a different training regime \citep{bleurt}. MAUVE measures distributional closeness between the attacked and unattacked sets \citep{mauve}. Each is normalised to $[0,1]$; the composite is the unweighted mean, and the per-metric values are reported so that a reader can reweight them. We also report the length ratio, because a tactic that shortens the document can inflate similarity scores while dropping content.
+
+\paragraph{Human ratings.}
+A stratified sample of \ph{number} documents is rated on a five-point scale for meaning preservation and fluency by \ph{number} raters, with agreement reported as Krippendorff's $\alpha$. The sample is drawn across domains, chains, and removal outcomes, so that the automatic scores can be checked where they matter. The rating protocol is in Appendix~\ref{app:prompts}.
+
+\paragraph{Threshold.}
+The semantic floor is $\tau = \ph{value}$, chosen before the search as \ph{justification}. Results at $\tau - 0.05$ and $\tau + 0.05$ are reported in Appendix~\ref{app:perdomain} so that the sensitivity of the recommendation to the floor is visible.
+
+\subsection{Single Tactics}
+
+Table~\ref{tab:singles} reports every tactic applied once. The control row is the reference point: its removal rate should match the unattacked baseline.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Single tactics at their default intensity. Higher removal is better; higher TPR at $1\%$ FPR means the detector still finds the mark. Preservation columns are higher-is-better except length ratio, which is closest to $1$ at $1.0$.}
+\label{tab:singles}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.0cm}ccccc@{}}
+\toprule
+Tactic & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & BERTScore $\uparrow$ & COMET $\uparrow$ & Length ratio \\
+\midrule
+Instruction paraphrase   & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Discourse paraphrase     & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Masked-LM infilling      & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Style normalisation      & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Document rewrite         & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Single-pivot back-translation & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Multi-hop back-translation & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Cross-lingual generation & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Synonym substitution     & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Random word edits        & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Typo and noise injection & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+Non-origin regeneration  & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+\midrule
+Unicode scrub (control)  & \ph{run} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Pairs and Triples}
+
+Tables~\ref{tab:pairs} and~\ref{tab:triples} report the best chains at each depth on the held-out split, ordered by removal rate among chains that satisfy the semantic floor. The full ranked list is released with the results archive.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Best ordered pairs. Ranks are by removal rate among admissible chains.}
+\label{tab:pairs}
+\begin{tabular}{@{}clcccc@{}}
+\toprule
+Rank & Chain & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ & Length ratio \\
+\midrule
+1 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+2 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+3 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+4 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+5 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{Best ordered triples. The third step is compared against the pair it extends.}
+\label{tab:triples}
+\begin{tabular}{@{}clcccc@{}}
+\toprule
+Rank & Chain & Removal $\uparrow$ & TPR@1\%FPR $\downarrow$ & COMET $\uparrow$ & Length ratio \\
+\midrule
+1 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+2 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+3 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+4 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+5 & \ph{chain} & \ph{run} & \ph{run} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Frontier}
+
+Figure~\ref{fig:pareto} plots removal against preservation for every evaluated chain. The frontier is the set of chains not dominated on both axes. The recommendation in \S\ref{sec:discussion} is the frontier point with the highest removal among chains at or above $\tau$.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox[c][0.28\textheight][c]{0.9\linewidth}{\centering \ph{Pareto plot: removal rate on the vertical axis, composite preservation on the horizontal axis; single tactics, pairs, and triples in separate series; the semantic floor drawn as a vertical line.}}}
+\caption{Removal against preservation for all evaluated chains.}
+\label{fig:pareto}
+\end{figure}
+
+\subsection{Per-Domain Results}
+
+Table~\ref{tab:perdomain} repeats the recommended chain per domain. Domain effects are expected: news writing constrains entities and numbers, question answering constrains facts, and creative writing leaves more room for paraphrase.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Recommended chain per domain at the same floor $\tau$.}
+\label{tab:perdomain}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Domain & Recommended chain & Removal $\uparrow$ & COMET $\uparrow$ \\
+\midrule
+News writing              & \ph{chain} & \ph{run} & \ph{run} \\
+Long-form QA              & \ph{chain} & \ph{run} & \ph{run} \\
+Creative writing          & \ph{chain} & \ph{run} & \ph{run} \\
+MarkMyWords tasks         & \ph{chain} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}

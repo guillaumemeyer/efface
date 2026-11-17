@@ -1,0 +1,23 @@
+\section{Limitations and Ethics}
+\label{sec:limitations}
+
+\paragraph{The oracle is same-config.}
+Every removal number in this paper comes from a detector configured with the same scheme parameters and key family used at generation. That is the right choice for a reproducible study, and it is also its main limit. A vendor detector may implement a different test, may aggregate evidence across a longer span, or may combine the statistical signal with retrieval against stored generations, as \citet{dipper} propose. Our results therefore bound the behaviour of the scheme, and they do not certify what a deployed checker will report. We avoid the phrase \emph{watermark-free} for that reason and report removal relative to a named detector.
+
+\paragraph{Semantic metrics are proxies.}
+BERTScore, BLEURT, COMET, and MAUVE each capture part of meaning and miss part of it. They are insensitive to some factual corruptions, they reward paraphrase that preserves entities and numbers, and they can be gamed by a tactic that keeps the opening sentence intact and rewrites the rest. The human rating sample is the check on the automatic scores, and it is small. A reader who cares about a specific failure mode, such as a changed number or a dropped attribution, should look at the per-metric table rather than the composite.
+
+\paragraph{Composition compounds loss.}
+A chain that satisfies the floor on average can still fail badly on individual documents. We report the distribution of per-document scores, and we flag chains whose lower tail falls below the floor even when their mean does not. The same applies to length: a tactic that shortens text reduces the evidence available to the detector, and shortening is itself a change in content that the composite score may not penalise enough.
+
+\paragraph{Length effects.}
+Detector power grows with the number of tokens. A removal rate measured at \ph{length} tokens does not transfer to a paragraph. We report results by length bucket in Appendix~\ref{app:perdomain}, and we do not extrapolate beyond the buckets we measured.
+
+\paragraph{Model and API drift.}
+Hosted models change without notice, and a rewrite produced by \ph{hosted model} in \ph{month} may not be reproducible later. We record model identifiers and dates for every call, pin open-weight checkpoints by revision, and treat a hosted-model change as a new experimental condition. The open-weight row exists partly to keep a reproducible anchor.
+
+\paragraph{Language coverage.}
+The evaluation is English-centric, with pivot languages chosen for translation quality. \citet{cwra} show that watermark strength varies across languages, so a chain that works in English may behave differently when the source is not English. We treat cross-lingual generalisation as future work.
+
+\paragraph{Ethics.}
+The work measures how robust a deployed provenance mark is, which is the kind of measurement that scheme designers and standards bodies need. The experiments run on prompts and texts the authors are authorised to process, and on public benchmark data. We do not evaluate removal on third-party content, we do not build a service, and we report results at a level that supports defence: which tactic class is cheapest to defend against, and where the frontier turns. Findings that a deployed scheme is weaker than reported are shared with the scheme's maintainers before publication.

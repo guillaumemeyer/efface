@@ -1,0 +1,9 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+Removal of a sampling-time text watermark is a trade-off between how much of the signal survives and how much of the meaning survives. This paper turns the trade-off into a constrained search: a catalogue of twelve tactics and one control, ordered chains of up to three, a semantic floor fixed in advance, and removal measured at both a per-document threshold and a corpus operating point. The result is a frontier rather than a single number, and a recommendation that names its cost.
+
+The method is deliberately boring. Every tactic has one interface, every chain is scored on the same documents, and every headline number is held out from the search that produced it. We hope that structure outlives the specific ranking, which will move as generators and attackers change.
+
+\paragraph{Future work.}
+Three directions follow. The first is cross-scheme transfer: whether the ranking of chains holds for green-list, exponential, and distortion-free schemes, or whether it is specific to SynthID-Text. The second is adaptive attack search, where the attacker queries a detector during the search and the detector is allowed to aggregate over longer spans. The third is defence: given the frontier in \S\ref{sec:results}, which watermark design and which detector-side aggregation push the turning point furthest out at the least quality cost.

@@ -41,6 +41,8 @@ H3 and H4 are exploratory if the pilot forces Tier A (no depth 3).
 | Attack catalogue | 12 tactics plus a Unicode-scrub control |
 | Chain depth | 1 to 3, ordered, repeats allowed |
 | Intensities | Default per tactic in the main sweep; depth-1 intensity sweep |
+| Search attacker | DeepSeek Flash, one model per chain |
+| Ablation attacker | Claude Sonnet on the top five chains, the best single tactic, and the control |
 | Stochastic repetitions | 3 seeds per document; the mean is scored |
 
 ## 3. Outcomes
@@ -57,6 +59,8 @@ as removed when the mark fails to be detected under every one of its three keys.
 - Removal and preservation by domain and by length bucket.
 - Removal at τ − 0.05 and τ + 0.05.
 - Marginal removal of each chain over its best prefix.
+- Rank stability across the two attackers: Spearman correlation over the ablated
+  rows and the largest absolute removal change.
 
 ## 4. Metrics
 
@@ -121,4 +125,4 @@ reason, and the affected results.
 
 | Date | Change | Reason |
 | --- | --- | --- |
-| — | — | — |
+| 2026-11-17 | Named the search and ablation attackers; added the second-attacker ablation as a secondary outcome | Design clarification before any removal result; no outcome definition changed |

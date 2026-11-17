@@ -1,35 +1,57 @@
-# Attacker roles. Model identifiers and prices are filled in Week 2 after the
-# provider and its terms of service are confirmed (docs/decisions.md, O4).
-provider:
-  kind: openai-compatible
-  base_url_env: REWRITE_BASE_URL
-  api_key_env: REWRITE_API_KEY
-  temperature: 0.9
+# Attacker models.
+#
+# One attacker is used per chain. The search uses a low-cost model; the
+# top chains are re-run end to end with a stronger model to test whether the
+# ranking transfers. Mixing models inside a chain would confound the result.
+#
+# Model snapshots and list prices are confirmed at W2.1. The prices here are
+# planning estimates for docs/budget.md, not billing truth.
+attackers:
+  deepseek_flash:
+    family: deepseek
+    provider:
+      kind: openai-compatible
+      base_url_env: DEEPSEEK_BASE_URL
+      api_key_env: DEEPSEEK_API_KEY
+    model: deepseek-flash
+    temperature: 0.9
+    pricing_usd_per_mtok:
+      input: 0.10
+      output: 0.40
+    pin_required: true
 
+  sonnet:
+    family: anthropic
+    provider:
+      kind: anthropic
+      base_url_env: ANTHROPIC_BASE_URL
+      api_key_env: ANTHROPIC_API_KEY
+    model: claude-sonnet
+    temperature: 0.9
+    pricing_usd_per_mtok:
+      input: 3.00
+      output: 15.00
+    pin_required: true
+
+# Role -> attacker mapping for the search sweep.
 roles:
-  paraphrase:
-    model: null
-    used_by:
-      - instruction_paraphrase
-      - discourse_paraphrase
-      - style_normalisation
-      - document_rewrite
-  translation:
-    model: null
-    used_by:
-      - backtranslate_single
-      - backtranslate_multi
-      - crosslingual_generation
+  paraphrase: deepseek_flash
+  translation: deepseek_flash
+  synonyms: deepseek_flash
+  regeneration: deepseek_flash
   infill:
-    model: roberta-large
     local: true
-    used_by:
-      - mlm_infill
-  synonyms:
-    model: null
-    used_by:
-      - synonym_substitution
-  regeneration:
-    model: null
-    used_by:
-      - regeneration
+    model: roberta-large
+
+# Second-attacker ablation. Runs after the search, on the held-out split.
+ablation:
+  attacker: sonnet
+  top_chains: 5
+  include_best_single: true
+  include_control: true
+  split: holdout
+  report:
+    - removal_rate
+    - composite_preservation
+    - spearman_rank_correlation
+    - max_absolute_delta

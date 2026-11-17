@@ -126,6 +126,37 @@ harness reports the one-sided normal p-value and validates its calibration on
 over-dispersed, the variance is estimated from that calibration set instead and
 the change is recorded here.
 
+## D11 — Attacker models
+
+| Role | Search sweep | Second-attacker ablation |
+| --- | --- | --- |
+| Paraphrase and style | DeepSeek Flash | Claude Sonnet |
+| Translation | DeepSeek Flash | Claude Sonnet |
+| Synonym candidates | DeepSeek Flash | Claude Sonnet |
+| Regeneration | DeepSeek Flash | Claude Sonnet |
+| Masked-LM infilling | local `roberta-large` | local `roberta-large` |
+
+Rules:
+
+- **One attacker per chain.** Every step of a chain uses the same model, so a
+  chain's result is attributable to the tactic sequence rather than to a model
+  switch inside the sequence.
+- **Search with the cheap model.** DeepSeek Flash keeps the search and the
+  intensity sweep inside the API cap.
+- **Confirm with the strong model.** The top five chains, the best single
+  tactic, and the Unicode control are re-run end to end on the held-out split
+  with Claude Sonnet. The paper reports the rank correlation and the largest
+  removal delta.
+- **Opus is not used.** The capability gap from Flash to Sonnet is the
+  informative contrast; Opus adds cost with little extra signal. A single Opus
+  run on the best chain remains an optional upper bound.
+- **Pin snapshots.** The provider model identifier and snapshot date are
+  recorded in every run manifest. The config carries the family name until
+  W2.1 confirms the exact snapshot.
+
+Estimated ablation cost: 7 rows over the held-out split is about 6,700
+document-attacks, roughly $65 at Sonnet list prices.
+
 ## Gate G1
 
 **Pass**, 2026-11-17. Measured on the M5: 12–22 seconds per 400-token
@@ -139,5 +170,6 @@ Details in `docs/perf.md`.
 | O1 | ~~Confirm `Qwen/Qwen2.5-1.5B-Instruct` runs under MarkLLM SynthID~~ — done in W1.6 | — | 2026-11-17 |
 | O2 | Author affiliation for `main.tex` and `CITATION.cff` | Author | 2026-12-01 |
 | O3 | ~~Record MarkLLM commit and model revisions~~ — commit `0a4fe8c`; HF revisions recorded in W2.1 | W2.1 | 2026-11-24 |
-| O4 | Confirm attack-model provider and terms of service | Author | 2026-11-24 |
+| O4 | Confirm both providers and their terms of service (DeepSeek and Anthropic) | Author | 2026-11-24 |
 | O5 | Validate the normal-approximation p-value on 100 unwatermarked documents per row | W2.2 | 2026-11-24 |
+| O6 | Pin exact attacker snapshots and list prices in `configs/attackers.yaml` | W2.1 | 2026-11-24 |

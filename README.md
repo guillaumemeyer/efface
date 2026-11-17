@@ -131,9 +131,9 @@ Configure the models. Keys live in the environment; `.env` is ignored by git.
 
 | Variable | Purpose |
 | --- | --- |
-| `REWRITE_API_KEY` | Paraphrase, translation, and regeneration calls |
-| `REWRITE_API_KEY` | Paraphrase, translation, and regeneration calls |
-| `REWRITE_BASE_URL` | Endpoint for the attacker model |
+| `DEEPSEEK_API_KEY` | Search attacker: paraphrase, translation, synonyms, regeneration |
+| `DEEPSEEK_BASE_URL` | DeepSeek OpenAI-compatible endpoint |
+| `ANTHROPIC_API_KEY` | Ablation attacker (Claude Sonnet) |
 | `MARKLLM_DIR` | Path to the MarkLLM checkout used as the detector |
 | `EFFACE_RESULTS_DIR` | Where run reports are written; defaults to `results/` |
 
@@ -209,11 +209,14 @@ Attackers, all from families other than the generator's:
 
 | Role | Model | Used by |
 | --- | --- | --- |
-| Paraphrase and style | TODO | Instruction paraphrase, discourse paraphrase, style normalisation, document rewrite |
-| Translation | TODO | All back-translation tactics |
-| Masked infilling | TODO | Masked-LM infilling |
-| Synonym candidates | TODO | Synonym substitution |
-| Regeneration | TODO | Non-origin regeneration |
+| Paraphrase and style | DeepSeek Flash | Instruction paraphrase, discourse paraphrase, style normalisation, document rewrite |
+| Translation | DeepSeek Flash | All back-translation tactics |
+| Masked infilling | `roberta-large` (local) | Masked-LM infilling |
+| Synonym candidates | DeepSeek Flash | Synonym substitution |
+| Regeneration | DeepSeek Flash | Non-origin regeneration |
+| Second-attacker ablation | Claude Sonnet | Top five chains, best single, control |
+
+One attacker is used per chain, so a chain's result is not confounded by a model switch inside the chain. The search runs on DeepSeek Flash. The top five chains, the best single tactic, and the control are re-run end to end with Claude Sonnet on the held-out split, and the paper reports the rank correlation and the largest removal change.
 
 Data:
 
@@ -282,6 +285,7 @@ Each row names the paper label, the command that produces it, and the expected r
 | `fig:pareto` | Frontier figure | `python -m efface.cli report --figure pareto` | TODO |
 | `tab:length` | Results by length bucket | `python -m efface.cli report --by length` | TODO |
 | `tab:tau` | Sensitivity to the floor | `python -m efface.cli report --tau-grid 0.05` | TODO |
+| `tab:ablation` | Second-attacker ablation | `python -m efface.cli report --ablation` | TODO |
 
 A smoke run that takes under two minutes and exercises one tactic on one prompt set:
 

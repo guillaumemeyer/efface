@@ -44,3 +44,27 @@ $\tau + 0.05$ & \ph{chain} & \ph{run} & \ph{run} \\
 \subsection{Failure Cases}
 
 \ph{Short list of documents where a chain satisfied the floor in expectation but changed a fact, a number, or an attribution. Each entry names the source, the attacked text, and the change.}
+
+\subsection{Second-Attacker Ablation}
+
+The top five chains, the best single tactic, and the control are re-run end to end with Claude Sonnet on the held-out split.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Removal under the search attacker and the second attacker, on the held-out split. $\Delta$ is the second-attacker removal minus the search-attacker removal.}
+\label{tab:ablation}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.6cm}ccc@{}}
+\toprule
+Chain & Removal (Flash) & Removal (Sonnet) & $\Delta$ \\
+\midrule
+\ph{chain}          & \ph{run} & \ph{run} & \ph{run} \\
+\ph{chain}          & \ph{run} & \ph{run} & \ph{run} \\
+\ph{chain}          & \ph{run} & \ph{run} & \ph{run} \\
+\ph{chain}          & \ph{run} & \ph{run} & \ph{run} \\
+\ph{chain}          & \ph{run} & \ph{run} & \ph{run} \\
+Best single tactic  & \ph{run} & \ph{run} & \ph{run} \\
+Unicode control     & \ph{run} & \ph{run} & \ph{run} \\
+\bottomrule
+\end{tabular}
+\end{table}

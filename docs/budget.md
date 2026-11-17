@@ -55,14 +55,25 @@ documents per generator: 720; held-out documents per generator: 480.
 | Calls per node, average (multi-hop and cross-lingual use 2–3) | 1.5 |
 | Effective calls | ~470,000 |
 
-At a cheap attacker priced at $0.15 per million input tokens and $0.60 per
-million output tokens, one call costs about $0.00032, so the sweep is about
-$150. A model three times more expensive puts it near $450, inside the cap. A
-model ten times more expensive would exceed it.
+At the assumed DeepSeek Flash list price of $0.10 per million input tokens and
+$0.40 per million output tokens, one call costs about $0.00021, so the search
+sweep is about $100.
 
-**Plan:** use the cheap model for the search and the parameter sweeps; reserve a
-stronger model for the regeneration row and for the final held-out pass. Cap at
-$600 in `configs/search.yaml`, with a per-run dry-run estimate and a stop rule.
+The second-attacker ablation adds six LLM rows (five chains, the best single,
+and the control, minus the control's zero API calls) over 960 held-out
+documents: about 5,800 document-attacks, or 8,600 calls after multi-step
+tactics. At Sonnet list prices of $3 and $15 per million tokens, one call costs
+about $0.0075, so the ablation is about $65.
+
+| Item | Calls | Unit cost | USD |
+| --- | --- | --- | --- |
+| Search sweep, DeepSeek Flash | ~470,000 | $0.00021 | ~$100 |
+| Second-attacker ablation, Claude Sonnet | ~8,600 | $0.0075 | ~$65 |
+| **Total** | | | **~$165** |
+
+**Plan:** use DeepSeek Flash for the search and the parameter sweeps; re-run the
+top chains with Claude Sonnet on the held-out split. Cap at $600 in
+`configs/search.yaml`, with a per-run dry-run estimate and a stop rule.
 
 ## Metric scoring
 
@@ -72,7 +83,8 @@ $600 in `configs/search.yaml`, with a per-run dry-run estimate and a stop rule.
 | COMET | 300,000 | 10 | 8.3 |
 | BLEURT (Tier B) | 300,000 | 20 | 4.2 |
 | MAUVE | per chain | — | 0.5 |
-| **Total** | | | **14.7** |
+| Ablation rows | 6,000 | 20 | 0.1 |
+| **Total** | | | **14.8** |
 
 Scores are computed once per (document, node) pair and cached; the held-out
 pass reuses them.
@@ -86,7 +98,7 @@ pass reuses them.
 
 ## Pessimistic case
 
-If attacker calls cost 3× the estimate, API spend reaches about $450, which
+If attacker calls cost 3× the estimate, API spend reaches about $500, which
 stays inside the cap. If a stronger model is used throughout, the cap binds:
 reduce beam width from 8 to 5, which cuts depth-3 nodes from 96 to 60, and
 evaluate metrics on a 50% subsample of the search split. Both are recorded as
@@ -97,5 +109,5 @@ deviations before the main sweep.
 | Resource | Estimate |
 | --- | --- |
 | Local compute | 30 hours |
-| API spend | $150–$600 |
+| API spend | $165–$600 |
 | Engineering and writing | 85–100 hours |

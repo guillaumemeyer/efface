@@ -111,6 +111,7 @@ The full design is the target. Scope drops in the order listed if a gate fails.
 - [ ] **W3.7** Per-domain and per-length-bucket results. Done when: data files for `tab:perdomain` and `tab:length`.
 - [ ] **W3.8** τ sensitivity at τ ± 0.05. Done when: data file for `tab:tau`.
 - [ ] **W3.9** Cost and runtime log: wall clock, API spend, GPU hours. Done when: `results/runlog.json`.
+- [ ] **W3.10** Second-attacker ablation: re-run the top five chains, the best single tactic, and the control with Claude Sonnet on the held-out split; report rank correlation and the maximum removal delta. Done when: `tab:ablation` data file exists.
 
 **Gate G3 decision recorded.**
 

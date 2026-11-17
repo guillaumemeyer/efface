@@ -22,6 +22,8 @@ G2 & \texttt{Qwen/Qwen2.5-1.5B-Instruct} & MarkLLM SynthID reimplementation & Ye
 \paragraph{Attackers.}
 Every tactic that calls a model uses a model from a family different from the generator, so that the attacker cannot reintroduce the generator's own mark. Table~\ref{tab:attackers} lists the models and their roles. The rule is applied per generator row: a chain that attacks a G1 document never uses a G1-family model, and the same holds for G2.
 
+One attacker is used per chain, so a chain's result is attributable to the tactic sequence rather than to a model switch inside the sequence. The search and the intensity sweep use DeepSeek Flash. After the search, the top five chains, the best single tactic, and the Unicode control are re-run end to end with Claude Sonnet on the held-out split. That ablation tests whether the ranking transfers across attacker capability, and its cost stays a small fraction of the search. Exact model snapshots and prices are pinned in \texttt{configs/attackers.yaml} and recorded in every run manifest.
+
 \begin{table}[t]
 \centering
 \small
@@ -31,11 +33,12 @@ Every tactic that calls a model uses a model from a family different from the ge
 \toprule
 Role & Model & Used by \\
 \midrule
-Paraphrase and style     & \ph{model and version} & Instruction paraphrase, discourse paraphrase, style, document rewrite \\
-Translation              & \ph{model and version} & All back-translation tactics \\
-Masked infilling         & \ph{model and version} & Masked-LM infilling \\
-Synonym candidates       & \ph{model and version} & Synonym substitution \\
-Regeneration             & \ph{model and version} & Non-origin regeneration \\
+Paraphrase and style     & DeepSeek Flash & Instruction paraphrase, discourse paraphrase, style, document rewrite \\
+Translation              & DeepSeek Flash & All back-translation tactics \\
+Masked infilling         & \texttt{roberta-large} & Masked-LM infilling \\
+Synonym candidates       & DeepSeek Flash & Synonym substitution \\
+Regeneration             & DeepSeek Flash & Non-origin regeneration \\
+Second-attacker ablation & Claude Sonnet & Top five chains, best single, control \\
 \bottomrule
 \end{tabular}
 \end{table}

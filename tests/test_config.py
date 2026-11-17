@@ -24,6 +24,16 @@ def test_digest_is_stable():
     assert len(digest(path)) == 64
 
 
+def test_attacker_roles_and_ablation():
+    attackers = load(CONFIG_DIR / "attackers.yaml")
+    assert set(attackers["attackers"]) == {"deepseek_flash", "sonnet"}
+    assert attackers["roles"]["paraphrase"] == "deepseek_flash"
+    assert attackers["roles"]["translation"] == "deepseek_flash"
+    assert attackers["roles"]["infill"]["local"] is True
+    assert attackers["ablation"]["attacker"] == "sonnet"
+    assert attackers["ablation"]["top_chains"] == 5
+
+
 def test_non_mapping_is_rejected(tmp_path):
     path = tmp_path / "bad.yaml"
     path.write_text("- one\n- two\n", encoding="utf-8")

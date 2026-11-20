@@ -320,6 +320,7 @@ Answers to the Machine Learning Reproducibility Checklist v2.0 (Pineau et al., 2
 
 - **The detector is a same-config oracle.** It is configured with the scheme parameters and key family used at generation, which makes the study reproducible and bounds it. A vendor detector may aggregate differently, and nothing here certifies what a deployed checker reports.
 - **Semantic metrics are proxies.** They miss some factual corruptions and can be gamed by a tactic that keeps the opening intact. A specific failure mode is best read from the per-metric table rather than the composite.
+- **No human evaluation.** A human rating study was out of scope, so preservation rests on the automatic metrics; their blind spots are a limitation of the preservation claim.
 - **Composition compounds loss.** A chain at the floor on average can still fail on individual documents; the per-document distribution is reported alongside the mean.
 - **Length effects.** Detector power grows with tokens, and removal rates do not transfer to short passages.
 - **Model drift.** Hosted models change without notice; a committed record of model identifiers and dates is the only mitigation.
@@ -328,7 +329,7 @@ Answers to the Machine Learning Reproducibility Checklist v2.0 (Pineau et al., 2
 
 ## Responsible use
 
-The work measures the robustness of a deployed provenance mark. That measurement is what scheme designers and standards bodies need in order to decide how much rewriting a mark should survive. The experiments run on prompts and texts the authors are authorised to process, plus public benchmark data. The repository ships no service, targets no third-party content, and reports results at the level of tactic classes and frontiers. Findings that a deployed scheme is weaker than reported are shared with its maintainers before publication.
+The work measures the robustness of a deployed provenance mark. That measurement is what scheme designers and standards bodies need in order to decide how much rewriting a mark should survive. The removal targets are model-generated documents; prompts come from self-authored sets and public benchmark tasks. No third-party document is attacked. EFFACE ships no service and no hosted endpoint, and reports results at the level of tactic classes and frontiers. The author maintains [`watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover), a separate MIT tool that removes provenance marks from content its users own; EFFACE reuses its strategy parser and statistics code. That tool is a competing interest and is disclosed here. Findings are shared with the maintainers of the implementation under test and, as a courtesy, with the SynthID and Claude watermark teams at least ten days before posting. The compliance record, including the provider-terms review, is in [`docs/ethics.md`](docs/ethics.md).
 
 ## Citation
 
@@ -385,7 +386,7 @@ External projects the study depends on or compares against. Each is governed by 
 | --- | --- | --- |
 | MarkLLM | Reference schemes and the same-config detector | [THU-BPM/MarkLLM](https://github.com/THU-BPM/MarkLLM) |
 | MarkMyWords | Benchmark tasks and tamper-resistance comparisons | [wagner-group/MarkMyWords](https://github.com/wagner-group/MarkMyWords) |
-| DIPPER | Discourse paraphraser used for the paraphrase family | [martiansideofthemoon/ai-detection-paraphrases](https://github.com/martiansideofthemoon/ai-detection-paraphrases) |
+| DIPPER | Discourse-paraphrase method reference (not executed; the paraphrase family uses the attacker model) | [martiansideofthemoon/ai-detection-paraphrases](https://github.com/martiansideofthemoon/ai-detection-paraphrases) |
 | Three Bricks | Token-substitution reference | [facebookresearch/three_bricks](https://github.com/facebookresearch/three_bricks) |
 | Impossibility watermark | Quality-oracle random-walk attack implementation | [hlzhang109/impossibility-watermark](https://github.com/hlzhang109/impossibility-watermark) |
 | Cross-lingual watermark project | Data and code for the pivot round-trip study | [cross-lingual-watermark.github.io](https://cross-lingual-watermark.github.io/) |
@@ -394,7 +395,9 @@ External projects the study depends on or compares against. Each is governed by 
 
 Copyright © 2026 Guillaume Meyer.
 
-Code is released under the [MIT License](LICENSE); the paper text and figures are released under [CC BY 4.0](LICENSE-paper). Third-party material cited in the paper remains under its own license.
+Code is released under the [MIT License](LICENSE); the paper text and figures are released under [CC BY 4.0](LICENSE-paper).
+
+MAUVE is GPLv3. It is isolated in the optional `metrics-gpl` extra and invoked as a separate process, so the core install remains MIT; see [`NOTICE`](NOTICE) and [`docs/ethics.md`](docs/ethics.md). `facebook/opt-1.3b` is used under the OPT-175B non-commercial research license; no weights or OPT-derived text are redistributed. MarkMyWords task text is third-party content and is not redistributed. Third-party material cited in the paper remains under its own license.
 
 ## Contact
 

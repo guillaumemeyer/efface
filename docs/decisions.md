@@ -155,13 +155,27 @@ Rules:
   W2.1 confirms the exact snapshot.
 
 Estimated ablation cost: 7 rows over the held-out split is about 6,700
-document-attacks, roughly $65 at Sonnet list prices.
+document-attacks, roughly $45–$60 at Sonnet 5.5 list prices after the tokenizer
+allowance. Details in `docs/budget.md`.
 
 ## Gate G1
 
 **Pass**, 2026-11-17. Measured on the M5: 12–22 seconds per 400-token
 document, 0.02–0.04 seconds per detection, 3.4 GB peak. Tier B is feasible.
 Details in `docs/perf.md`.
+
+## Ethics decisions (E1–E6)
+
+Recorded in `docs/ethics.md` on 2026-11-17.
+
+| ID | Decision | Consequence |
+| --- | --- | --- |
+| E1 | Proceed with the DeepSeek hosted API for the search, with mitigations | No attacked documents are published; training opt-out; dedicated account; open-weight attacker is the fallback |
+| E2 | MAUVE stays in the metric set as an optional GPLv3 extra, invoked as a subprocess | `mauve-text` is out of the `metrics` extra; the MIT core does not import it |
+| E3 | Disclosure floor of ten days before posting | Follow up after five business days; grant up to 90 days if a maintainer asks |
+| E4 | Disclose the author's separate removal tool in the paper and README | Competing interest stated; EFFACE itself ships no service |
+| E5 | Load MarkMyWords task text; do not redistribute it | The bundled text is third-party content; the manifest records the loader and checksums |
+| E6 | Release code, configs, and aggregate results only | No attacked corpus, model weights, or hosted endpoint |
 
 ## Open items
 
@@ -170,6 +184,6 @@ Details in `docs/perf.md`.
 | O1 | ~~Confirm `Qwen/Qwen2.5-1.5B-Instruct` runs under MarkLLM SynthID~~ — done in W1.6 | — | 2026-11-17 |
 | O2 | Author affiliation for `main.tex` and `CITATION.cff` | Author | 2026-12-01 |
 | O3 | ~~Record MarkLLM commit and model revisions~~ — commit `0a4fe8c`; HF revisions recorded in W2.1 | W2.1 | 2026-11-24 |
-| O4 | Confirm both providers and their terms of service (DeepSeek and Anthropic) | Author | 2026-11-24 |
+| O4 | ~~Confirm both providers and their terms of service~~ — done; see `docs/ethics.md` §4 | — | 2026-11-17 |
 | O5 | Validate the normal-approximation p-value on 100 unwatermarked documents per row | W2.2 | 2026-11-24 |
-| O6 | Pin exact attacker snapshots and list prices in `configs/attackers.yaml` | W2.1 | 2026-11-24 |
+| O6 | Pin exact attacker snapshots and list prices in `configs/attackers.yaml` — current: `deepseek-flash` (V4.1-Flash-1017) and `claude-sonnet-5-5` | W2.1 | 2026-11-24 |

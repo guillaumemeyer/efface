@@ -18,9 +18,19 @@ External dependencies used by optional extras:
   BERTScore — MIT License
   COMET — Apache License 2.0
   BLEURT — Apache License 2.0
-  MAUVE — Apache License 2.0
+  MAUVE — GNU GPLv3. Optional `metrics-gpl` extra only, invoked as a separate
+    process; it is not imported by the MIT-licensed package.
   Hugging Face Transformers — Apache License 2.0
   PyTorch — BSD 3-Clause License
 
 Model weights carry their own licenses. `facebook/opt-1.3b` is distributed
-under the OPT-175B license; `Qwen/Qwen2.5-1.5B-Instruct` is Apache-2.0.
+under the OPT-175B license, for non-commercial research use; the weights are
+not redistributed by this project. `Qwen/Qwen2.5-1.5B-Instruct` is Apache-2.0.
+
+OPT-175B is licensed under the OPT-175B license, Copyright (c) Meta Platforms,
+Inc. All Rights Reserved.
+
+MarkMyWords task text bundled with the upstream benchmark contains third-party
+content (the task metadata records Codewars sources). The MarkMyWords
+repository license covers its code; the bundled text is not redistributed by
+this project. `data/manifest.json` records the upstream commit and checksums.

@@ -23,10 +23,14 @@ dev = [
 metrics = [
   "bert-score>=0.3.13,<1",
   "comet>=2.2,<3",
-  "mauve-text>=0.4,<1",
   "sentence-transformers>=3.3,<6",
   "torch>=2.5,<3",
   "transformers>=4.46,<6",
+]
+# MAUVE is GPLv3. It is isolated in its own extra and invoked as a subprocess
+# by the metric runner; importing it from efface/ would relicense the package.
+metrics-gpl = [
+  "mauve-text>=0.4,<1",
 ]
 watermark = [
   "torch>=2.5,<3",

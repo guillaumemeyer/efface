@@ -11,6 +11,10 @@ metrics:
   mauve:
     tier: A
     normalize: identity
+    # GPLv3: installed from the `metrics-gpl` extra and called as a separate
+    # process. Do not import mauve from efface/.
+    extra: metrics-gpl
+    isolation: subprocess
   bleurt:
     tier: B
     model: BLEURT-20

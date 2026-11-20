@@ -55,21 +55,31 @@ documents per generator: 720; held-out documents per generator: 480.
 | Calls per node, average (multi-hop and cross-lingual use 2–3) | 1.5 |
 | Effective calls | ~470,000 |
 
-At the assumed DeepSeek Flash list price of $0.10 per million input tokens and
-$0.40 per million output tokens, one call costs about $0.00021, so the search
-sweep is about $100.
+DeepSeek Flash list prices on 2026-11-17 are $0.30 per million input tokens and
+$1.20 per million output tokens at peak, and $0.15 / $0.60 off-peak; a cache hit
+is $0.006 / $0.003. At 500 input and 400 output tokens, one call costs about
+$0.00063 at peak and $0.00032 off-peak, so the search sweep is $150–$300 before
+prefix caching. Peak hours are 01:00–04:00 and 06:00–10:00 UTC on weekdays; the
+search can be scheduled off-peak. Thinking mode is disabled for rewrite calls,
+because it lengthens outputs and raises cost.
 
 The second-attacker ablation adds six LLM rows (five chains, the best single,
 and the control, minus the control's zero API calls) over 960 held-out
 documents: about 5,800 document-attacks, or 8,600 calls after multi-step
-tactics. At Sonnet list prices of $3 and $15 per million tokens, one call costs
-about $0.0075, so the ablation is about $65.
+tactics. At Sonnet 5.5 list prices of $2 and $10 per million tokens, one call
+costs about $0.005 at the estimated token counts. Claude 4.7 and later
+tokenizers produce about 30% more tokens for the same text, so budget about
+$0.0065 per call and $55–$60 for the ablation.
 
 | Item | Calls | Unit cost | USD |
 | --- | --- | --- | --- |
-| Search sweep, DeepSeek Flash | ~470,000 | $0.00021 | ~$100 |
-| Second-attacker ablation, Claude Sonnet | ~8,600 | $0.0075 | ~$65 |
-| **Total** | | | **~$165** |
+| Search sweep, DeepSeek Flash | ~470,000 | $0.00032–$0.00063 | ~$150–$300 |
+| Second-attacker ablation, Claude Sonnet 5.5 | ~8,600 | $0.005–$0.0065 | ~$45–$58 |
+| **Total** | | | **~$195–$355** |
+
+Prices were checked on 2026-11-17 and are re-checked at W2.1. The estimate
+ignores prefix caching, which lowers the input side, so the upper end is
+conservative.
 
 **Plan:** use DeepSeek Flash for the search and the parameter sweeps; re-run the
 top chains with Claude Sonnet on the held-out split. Cap at $600 in

@@ -4,8 +4,8 @@
 # top chains are re-run end to end with a stronger model to test whether the
 # ranking transfers. Mixing models inside a chain would confound the result.
 #
-# Model snapshots and list prices are confirmed at W2.1. The prices here are
-# planning estimates for docs/budget.md, not billing truth.
+# Model snapshots and list prices were checked on 2026-11-17. Re-check at W2.1
+# and record the exact snapshot and terms version in every run manifest.
 attackers:
   deepseek_flash:
     family: deepseek
@@ -14,10 +14,16 @@ attackers:
       base_url_env: DEEPSEEK_BASE_URL
       api_key_env: DEEPSEEK_API_KEY
     model: deepseek-flash
+    snapshot: DeepSeek-V4.1-Flash-1017
+    thinking: false
     temperature: 0.9
     pricing_usd_per_mtok:
-      input: 0.10
-      output: 0.40
+      input: 0.30
+      output: 1.20
+      input_off_peak: 0.15
+      output_off_peak: 0.60
+      input_cache_hit: 0.006
+      output_cache_hit: 0.003
     pin_required: true
 
   sonnet:
@@ -26,11 +32,11 @@ attackers:
       kind: anthropic
       base_url_env: ANTHROPIC_BASE_URL
       api_key_env: ANTHROPIC_API_KEY
-    model: claude-sonnet
+    model: claude-sonnet-5-5
     temperature: 0.9
     pricing_usd_per_mtok:
-      input: 3.00
-      output: 15.00
+      input: 2.00
+      output: 10.00
     pin_required: true
 
 # Role -> attacker mapping for the search sweep.

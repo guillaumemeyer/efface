@@ -65,3 +65,7 @@ config.local.*
 .DS_Store
 ._*
 .AppleDouble
+
+# Local agent skills (installed per checkout)
+.agents/
+skills-lock.json

@@ -44,8 +44,10 @@ def build_parser() -> argparse.ArgumentParser:
             command.add_argument("--depth", type=int, default=3)
             command.add_argument("--beam", type=int, default=8)
         if name == "attack":
-            command.add_argument("--tactic", default=None)
-            command.add_argument("--intensity", type=float, default=1.0)
+            command.add_argument("--tactic", required=True)
+            command.add_argument("--intensity", type=float, default=None)
+            command.add_argument("--attacker", default="deepseek_flash")
+            command.add_argument("--seed", type=int, default=0)
         if name == "score":
             command.add_argument("--alpha", type=float, default=0.05)
             command.add_argument("--row", default="g1", help="generator row key")
@@ -219,6 +221,66 @@ def _score(args: argparse.Namespace) -> int:
     return 0
 
 
+def _build_chat(attacker: str):
+    """Chat client for an attacker id from configs/attackers.yaml."""
+    from efface.attacks.client import OpenAICompatibleChat
+    from efface.config import load
+
+    config = load("configs/attackers.yaml")["attackers"][attacker]
+    provider = config["provider"]
+    return OpenAICompatibleChat.from_env(
+        base_url_env=provider["base_url_env"],
+        api_key_env=provider["api_key_env"],
+        model=config["model"],
+        temperature=float(config.get("temperature", 0.9)),
+    )
+
+
+def _build_attack(args: argparse.Namespace, *, chat=None):
+    from efface.attacks import build, needs_model
+    from efface.attacks.mlm import RobertaFiller
+    from efface.config import load
+
+    settings = load("configs/tactics.yaml").get("tactics", {}).get(args.tactic, {})
+    filler = RobertaFiller() if args.tactic == "mlm_infill" else None
+    if needs_model(args.tactic) and chat is None:
+        chat = _build_chat(args.attacker)
+    return build(args.tactic, chat=chat, filler=filler, settings=settings)
+
+
+def _attack(args: argparse.Namespace) -> int:
+    from efface.attacks import get
+    from efface.watermark import read_jsonl, write_jsonl
+
+    if not args.input:
+        print("attack needs --input", file=sys.stderr)
+        return 2
+    try:
+        tactic_class = get(args.tactic)
+    except KeyError:
+        print(f"unknown tactic {args.tactic!r}", file=sys.stderr)
+        return 2
+    intensity = args.intensity if args.intensity is not None else tactic_class.default_intensity
+    if not 0.0 < intensity <= 1.0:
+        print("--intensity must lie in (0, 1]", file=sys.stderr)
+        return 2
+    tactic = _build_attack(args)
+
+    def attacked():
+        for record in read_jsonl(args.input):
+            new_text = tactic.apply(record["text"], intensity=intensity, seed=args.seed)
+            chain = list(record.get("chain", []))
+            chain.append(
+                {"tactic": args.tactic, "intensity": intensity, "seed": args.seed}
+            )
+            yield {**record, "text": new_text, "chain": chain}
+
+    output = args.output or "results/attacked.jsonl"
+    count = write_jsonl(attacked(), output)
+    print(f"attack: wrote {count} records to {output}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "smoke":
@@ -227,6 +289,8 @@ def main(argv: list[str] | None = None) -> int:
         return _generate(args)
     if args.command == "score":
         return _score(args)
+    if args.command == "attack":
+        return _attack(args)
     print(f"{args.command}: not implemented yet (planned in PLAN.md)", file=sys.stderr)
     return 2
 

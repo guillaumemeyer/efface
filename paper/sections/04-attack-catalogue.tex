@@ -1,16 +1,16 @@
 \section{Attack Catalogue}
 \label{sec:catalogue}
 
-Table~\ref{tab:catalogue} lists the tactics we study. Each row is a transformation with one interface, one intensity parameter, and one implementation in the repository. The families differ in what they perturb: paraphrase and regeneration replace the token stream through a model, back-translation replaces it through a translation system, and token edits touch individual positions. The control row is included so that a reader can see the difference between removing an edit-based carrier and attacking a statistical mark.
+Table~\ref{tab:catalogue} lists the tactics we study. Each row is a transformation with one interface, one intensity parameter, and one implementation in the repository. The systems we execute are prompted rewrites, a local masked-LM filler, and deterministic text rules; several rows are operationalisations of a published attack rather than the published system. The row-by-row difference is in the released catalogue document: discourse and document rewrite prompt a model rather than running DIPPER, masked infilling masks a seeded sample rather than the highest-self-information tokens, synonym substitution takes candidates from a prompted model rather than Three Bricks' substitution model, and the pivot rows use one model for every leg. The search is non-adaptive: no tactic is trained against the detector. The families differ in what they perturb: paraphrase and regeneration replace the token stream through a model, back-translation replaces it through a translation system, and token edits touch individual positions. The control row is included so that a reader can see the difference between removing an edit-based carrier and attacking a statistical mark.
 
 \begin{table*}[t]
 \centering
 \footnotesize
-\caption{Attack catalogue. Cost is the expected loss of semantic fidelity at the intensity used in the main experiments: low, medium, or high. Source names the paper that introduced or evaluated the tactic. Each row maps to a module under \texttt{efface/attacks/} named after the tactic.}
+\caption{Attack catalogue. Cost is the expected loss of semantic fidelity at the intensity used in the main experiments: low, medium, or high. Source names the closest published relative, not necessarily the system executed; \S\ref{sec:catalogue} states the operational difference per row. Each row maps to a module under \texttt{efface/attacks/}.}
 \label{tab:catalogue}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}p{2.6cm} >{\raggedright\arraybackslash}p{3.5cm} l >{\raggedright\arraybackslash}p{3.3cm}@{}}
 \toprule
-Tactic & Family & What it changes & Cost & Source \\
+Tactic & Family & What it changes & Cost & Closest relative \\
 \midrule
 Instruction paraphrase      & Paraphrase      & Sentence wording, kept close to source & Low    & \citet{kgwreliability} \\
 Discourse paraphrase        & Paraphrase      & Paragraph structure and wording & Medium & \citet{dipper} \\

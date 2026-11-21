@@ -162,21 +162,23 @@ python -m efface.cli score --input results/docs.jsonl \
 
 The catalogue is the unit of comparison. Each tactic has one interface, one intensity parameter, and one implementation. Semantic cost is the expected loss of fidelity at the intensity used in the main sweep.
 
-| Tactic | Family | What it changes | Semantic cost | Source | Implementation |
+The Source column names the closest published relative. The executed system is a prompted rewrite, a local masked-LM filler, or a deterministic rule set; [`docs/attack-catalogue.md`](docs/attack-catalogue.md) gives the operational difference per row.
+
+| Tactic | Family | What it changes | Semantic cost | Closest relative | Implementation |
 | --- | --- | --- | --- | --- | --- |
-| Instruction paraphrase | Paraphrase | Sentence wording, kept close to the source | Low | Kirchenbauer et al. 2024 | `efface/attacks/paraphrase_instruct.py` |
-| Discourse paraphrase | Paraphrase | Paragraph structure, sentence boundaries, wording | Medium | Krishna et al. 2023 | `efface/attacks/paraphrase_discourse.py` |
-| Masked-LM infilling | Paraphrase | Individual spans, local context only | Low | Cheng et al. 2025 | `efface/attacks/infill_mlm.py` |
-| Style normalisation | Paraphrase | Contractions, casing, punctuation, filler, stock transitions | Low | Piet et al. 2025 | `efface/attacks/humanize_style.py` |
-| Document rewrite | Paraphrase | Whole document, fresh context per chunk | High | Krishna et al. 2023 | `efface/attacks/rewrite_document.py` |
-| Single-pivot back-translation | Back-translation | Token stream, through one pivot language | Medium | Piet et al. 2025 | `efface/attacks/backtranslate.py` |
-| Multi-hop back-translation | Back-translation | Token stream, through two or more pivots | High | He et al. 2024 | `efface/attacks/backtranslate.py` |
-| Cross-lingual generation | Back-translation | Response generated in the pivot, then translated back | High | He et al. 2024 | `efface/attacks/crosslingual.py` |
-| Synonym substitution | Token edits | A fraction of content words | Low | Fernandez et al. 2023 | `efface/attacks/synonym_sub.py` |
-| Random word edits | Token edits | Swap, insert, or delete at random positions | Low | Piet et al. 2025 | `efface/attacks/random_edits.py` |
-| Typo and noise injection | Token edits | Character-level noise and misspellings | Low | Piet et al. 2025 | `efface/attacks/typo_noise.py` |
-| Non-origin regeneration | Regeneration | The entire token stream, from a different model family | High | He et al. 2024 | `efface/attacks/regenerate.py` |
-| Unicode scrub | Control | Invisible and zero-width characters only | None | Piet et al. 2025 | `efface/attacks/unicode_scrub.py` |
+| Instruction paraphrase | Paraphrase | Sentence wording, kept close to the source | Low | Kirchenbauer et al. 2024 | `efface/attacks/model.py` |
+| Discourse paraphrase | Paraphrase | Paragraph structure, sentence boundaries, wording | Medium | Krishna et al. 2023 | `efface/attacks/model.py` |
+| Masked-LM infilling | Paraphrase | Individual spans, local context only | Low | Cheng et al. 2025 | `efface/attacks/mlm.py` |
+| Style normalisation | Paraphrase | Contractions, casing, punctuation, filler, stock transitions | Low | Piet et al. 2025 | `efface/attacks/local.py` |
+| Document rewrite | Paraphrase | Whole document, fresh context per chunk | High | Krishna et al. 2023 | `efface/attacks/model.py` |
+| Single-pivot back-translation | Back-translation | Token stream, through one pivot language | Medium | Piet et al. 2025 | `efface/attacks/model.py` |
+| Multi-hop back-translation | Back-translation | Token stream, through two or more pivots | High | He et al. 2024 | `efface/attacks/model.py` |
+| Cross-lingual generation | Back-translation | Response generated in the pivot, then translated back | High | He et al. 2024 | `efface/attacks/model.py` |
+| Synonym substitution | Token edits | A fraction of content words | Low | Fernandez et al. 2023 | `efface/attacks/model.py` |
+| Random word edits | Token edits | Swap, insert, or delete at random positions | Low | Piet et al. 2025 | `efface/attacks/local.py` |
+| Typo and noise injection | Token edits | Character-level noise and misspellings | Low | Piet et al. 2025 | `efface/attacks/local.py` |
+| Non-origin regeneration | Regeneration | The entire token stream, from a different model family | High | He et al. 2024 | `efface/attacks/model.py` |
+| Unicode scrub | Control | Invisible and zero-width characters only | None | Piet et al. 2025 | `efface/attacks/local.py` |
 
 The control row exists to separate two channels. A sampling-time mark is not carried by invisible characters, so the scrub should leave its detection score unchanged; if it does not, the measurement is picking up something other than the statistical signal.
 

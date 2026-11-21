@@ -1,0 +1,52 @@
+[
+  {
+    "id": "news-1",
+    "source": "The city council approved the transit plan by a vote of seven to four on Tuesday. The plan costs 42 million dollars and adds two bus routes in the north end.",
+    "candidate": "On Tuesday, the city council approved the transit plan by a seven-to-four vote. The plan will cost 42 million dollars and adds two bus routes in the north end."
+  },
+  {
+    "id": "news-2",
+    "source": "Officials said the library will reopen in March after a two-year renovation. The building now has a new roof and a larger children's section.",
+    "candidate": "The library is expected to reopen in March following two years of renovation work, officials said. The building has a new roof and a bigger children's area."
+  },
+  {
+    "id": "qa-1",
+    "source": "Bus networks are expensive to run because vehicles, drivers, and maintenance are paid for continuously while fares recover only part of the cost. Density helps: a route with many riders spreads the fixed cost over more trips.",
+    "candidate": "Running bus networks costs a lot since vehicles, drivers, and maintenance are paid for all the time, while fares cover only some of it. Density matters because a busy route spreads fixed costs across more journeys."
+  },
+  {
+    "id": "qa-2",
+    "source": "A watermark is a statistical signal embedded during sampling. Detection compares the observed token choices with the choices the key would have favoured, so the test needs enough tokens to separate the signal from chance.",
+    "candidate": "Watermarking embeds a statistical signal while the model samples. To detect it, you compare the tokens that appeared with those the key would have preferred, which means short passages carry too little evidence to separate the mark from noise."
+  },
+  {
+    "id": "creative-1",
+    "source": "The driver pulled the bus to the curb and switched off the engine. For twenty years he had ended his shift at this stop, and tonight the street looked the same.",
+    "candidate": "He eased the bus to the curb and killed the engine. This stop had ended his shift for twenty years, and the street tonight looked no different."
+  },
+  {
+    "id": "creative-2",
+    "source": "Rain had been falling since morning, and the market stalls were half empty. She bought a paper bag of apples and walked home along the canal.",
+    "candidate": "It had rained all morning, so half the market stalls stood empty. She picked up a paper bag of apples and took the canal path home."
+  },
+  {
+    "id": "typo-1",
+    "source": "The committee will publish its findings next week and answer questions at a public meeting.",
+    "candidate": "The commitee will publsh its findngs next week and answr questions at a public meting."
+  },
+  {
+    "id": "short-1",
+    "source": "The train was late again.",
+    "candidate": "The train arrived late once more."
+  },
+  {
+    "id": "long-1",
+    "source": "Renewable energy projects often face long permitting timelines. A solar farm may need environmental review, grid connection studies, and local approval before construction begins, and each stage can take months. Developers argue that predictable rules would lower financing costs, while residents ask for time to review visual and land-use effects.",
+    "candidate": "Permitting for renewable projects tends to be slow. Before building a solar farm, a developer may need an environmental review, a grid connection study, and local approval, and any of these can take months. Industry groups say stable rules would reduce financing costs; residents want time to consider visual and land-use impacts."
+  },
+  {
+    "id": "long-2",
+    "source": "The museum's collection moved to a temporary site during the roof repairs. Staff packed more than four thousand objects, and the most fragile pieces travelled in custom crates with humidity sensors.",
+    "candidate": "While the roof was being repaired, the museum moved its collection to a temporary site. More than four thousand objects were packed by staff, and the most delicate items went in custom crates fitted with humidity sensors."
+  }
+]

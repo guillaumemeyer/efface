@@ -1,5 +1,18 @@
-"""Evaluation primitives: rates, intervals, splits, frontier, cost."""
+"""Evaluation primitives: rates, intervals, splits, frontier, cost, preservation."""
 
+from efface.evaluate.preservation import (
+    REPORTED_ONLY,
+    SELECTING,
+    BertScore,
+    Bleurt,
+    Comet,
+    PreservationReport,
+    aggregate,
+    below_floor_fraction,
+    composite,
+    length_ratio,
+    score_pairs,
+)
 from efface.evaluate.stats import (
     Rate,
     auroc,
@@ -16,15 +29,26 @@ from efface.evaluate.stats import (
 )
 
 __all__ = [
+    "REPORTED_ONLY",
+    "SELECTING",
+    "BertScore",
+    "Bleurt",
+    "Comet",
+    "PreservationReport",
     "Rate",
+    "aggregate",
     "auroc",
+    "below_floor_fraction",
+    "composite",
     "clustered_rate",
     "detection_check_pass",
     "holm",
     "is_removed",
+    "length_ratio",
     "normal_quantile",
     "paired_bootstrap_diff",
     "removal_rate",
+    "score_pairs",
     "tpr_at_fpr",
     "tpr_at_fpr_parametric",
     "wilson_interval",

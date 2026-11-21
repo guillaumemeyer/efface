@@ -22,10 +22,14 @@ dev = [
 ]
 metrics = [
   "bert-score>=0.3.13,<1",
-  "comet>=2.2,<3",
+  # The translation metric is unbabel-comet; the PyPI name `comet` is an
+  # astronomy broker.
+  "unbabel-comet>=2.2,<3",
   "sentence-transformers>=3.3,<6",
   "torch>=2.5,<3",
   "transformers>=4.46,<6",
+  # unbabel-comet pins torchmetrics 0.10, which imports pkg_resources.
+  "setuptools<81",
 ]
 # MAUVE is GPLv3. It is isolated in its own extra and invoked as a subprocess
 # by the metric runner; importing it from efface/ would relicense the package.

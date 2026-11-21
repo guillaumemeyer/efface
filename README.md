@@ -110,7 +110,7 @@ Directories marked *planned* do not exist yet.
 
 > Not runnable yet. The package, `pyproject.toml`, and `configs/` land with the first code release. The commands below describe the intended workflow so that the reproduction table has a stable target.
 
-Requirements: Python 3.11 or newer, a MarkLLM checkout for the detector, and API keys for the hosted models you configure.
+Requirements: Python 3.11 or newer, a MarkLLM checkout for the detector, and API keys for the hosted models you configure. Preservation metrics need the `metrics` extra (`uv pip install -e ".[metrics]"`), which pulls BERTScore and `unbabel-comet`; the first run downloads `roberta-large` and a COMET checkpoint. See [`docs/metric-calibration.md`](docs/metric-calibration.md).
 
 ```sh
 git clone https://github.com/guillaumemeyer/efface.git

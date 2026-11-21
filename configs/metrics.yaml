@@ -6,7 +6,7 @@ metrics:
     normalize: identity
   comet:
     tier: A
-    model: wmt22-comet-da
+    model: Unbabel/wmt22-comet-da
     normalize: clip_0_1
   mauve:
     tier: A

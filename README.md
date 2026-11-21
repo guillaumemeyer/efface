@@ -148,8 +148,18 @@ The three commands below are the planned interface. They are listed here so the 
 python -m efface.cli generate --config configs/generators.yaml \
   --row g1 --prompts data/prompts.jsonl --limit 1 --output results/docs.jsonl
 
-# 2. Apply one tactic to it
-python -m efface.cli attack --tactic backtranslate --intensity 1 --input results/news-0001.json
+# 2. Apply one tactic, or an ordered chain, to every document
+python -m efface.cli attack --tactic typo_noise --intensity 0.05 --input results/docs.jsonl
+python -m efface.cli attack --strategy "typo_noise@0.05,random_edits@0.1" \
+  --input results/docs.jsonl --output results/attacked.jsonl
+```
+
+The chain executor caches the text after every prefix under `--cache-dir`
+(default `results/cache`), keyed by document, seed, and prefix. A depth-3
+extension of a depth-2 chain therefore skips the first two steps, and a rerun
+reuses paid model calls. Each record's `chain` lists the steps that ran, with
+their measured character edit rate, and `resumed_at` says how many prefixes came
+from the cache.
 
 # 3. Score removal under each document's generating key
 python -m efface.cli score --input results/docs.jsonl \

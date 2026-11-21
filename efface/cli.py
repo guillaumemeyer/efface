@@ -44,10 +44,12 @@ def build_parser() -> argparse.ArgumentParser:
             command.add_argument("--depth", type=int, default=3)
             command.add_argument("--beam", type=int, default=8)
         if name == "attack":
-            command.add_argument("--tactic", required=True)
+            command.add_argument("--tactic", default=None)
+            command.add_argument("--strategy", default=None, help="tactic@intensity,...")
             command.add_argument("--intensity", type=float, default=None)
             command.add_argument("--attacker", default="deepseek_flash")
             command.add_argument("--seed", type=int, default=0)
+            command.add_argument("--cache-dir", default="results/cache")
         if name == "score":
             command.add_argument("--alpha", type=float, default=0.05)
             command.add_argument("--row", default="g1", help="generator row key")
@@ -250,30 +252,59 @@ def _build_attack(args: argparse.Namespace, *, chat=None):
 
 def _attack(args: argparse.Namespace) -> int:
     from efface.attacks import get
+    from efface.chains import ChainExecutor, DiskCache
+    from efface.search.strategy import parse_strategy
     from efface.watermark import read_jsonl, write_jsonl
 
     if not args.input:
         print("attack needs --input", file=sys.stderr)
         return 2
-    try:
-        tactic_class = get(args.tactic)
-    except KeyError:
-        print(f"unknown tactic {args.tactic!r}", file=sys.stderr)
+    if args.strategy:
+        steps = parse_strategy(args.strategy)
+    elif args.tactic:
+        try:
+            tactic_class = get(args.tactic)
+        except KeyError:
+            print(f"unknown tactic {args.tactic!r}", file=sys.stderr)
+            return 2
+        intensity = (
+            args.intensity
+            if args.intensity is not None
+            else tactic_class.default_intensity
+        )
+        if not 0.0 < intensity <= 1.0:
+            print("--intensity must lie in (0, 1]", file=sys.stderr)
+            return 2
+        steps = ((args.tactic, intensity),)
+    else:
+        print("attack needs --tactic or --strategy", file=sys.stderr)
         return 2
-    intensity = args.intensity if args.intensity is not None else tactic_class.default_intensity
-    if not 0.0 < intensity <= 1.0:
-        print("--intensity must lie in (0, 1]", file=sys.stderr)
-        return 2
-    tactic = _build_attack(args)
+
+    executor = ChainExecutor(
+        lambda name: _build_attack(argparse.Namespace(**{**vars(args), "tactic": name})),
+        cache=DiskCache(args.cache_dir),
+        seed=args.seed,
+    )
 
     def attacked():
         for record in read_jsonl(args.input):
-            new_text = tactic.apply(record["text"], intensity=intensity, seed=args.seed)
+            result = executor.run(record["text"], steps, doc_id=record.get("doc_id", ""))
             chain = list(record.get("chain", []))
-            chain.append(
-                {"tactic": args.tactic, "intensity": intensity, "seed": args.seed}
+            chain.extend(
+                {
+                    "tactic": step.tactic,
+                    "intensity": step.intensity,
+                    "seed": args.seed,
+                    "edit_rate": round(step.edit_rate, 4),
+                }
+                for step in result.steps
             )
-            yield {**record, "text": new_text, "chain": chain}
+            yield {
+                **record,
+                "text": result.text,
+                "chain": chain,
+                "resumed_at": result.resumed_at,
+            }
 
     output = args.output or "results/attacked.jsonl"
     count = write_jsonl(attacked(), output)

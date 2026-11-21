@@ -183,13 +183,17 @@ def test_cli_attack_applies_a_chain(tmp_path):
             str(source),
             "--output",
             str(output),
+            "--cache-dir",
+            str(tmp_path / "cache"),
         ]
     )
     assert code == 0
     record = list(read_jsonl(output))[0]
-    assert record["chain"] == [
-        {"tactic": "style_normalisation", "intensity": 1.0, "seed": 0}
+    assert [(step["tactic"], step["intensity"]) for step in record["chain"]] == [
+        ("style_normalisation", 1.0)
     ]
+    assert 0.0 <= record["chain"][0]["edit_rate"] <= 1.0
+    assert record["resumed_at"] == 0
     assert "utilize" not in record["text"]
     assert record["key"] == 3
 

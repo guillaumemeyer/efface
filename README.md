@@ -144,8 +144,9 @@ Every model identifier and version is pinned in `configs/`. A run whose config d
 The three commands below are the planned interface. They are listed here so the reproduction table has a stable target.
 
 ```sh
-# 1. Generate a watermarked document from a prompt
-python -m efface.cli generate --config configs/generators/g1.yaml --prompt-id news-0001
+# 1. Generate watermarked documents: one per prompt per key
+python -m efface.cli generate --config configs/generators.yaml \
+  --row g1 --prompts data/prompts.jsonl --limit 1 --output results/docs.jsonl
 
 # 2. Apply one tactic to it
 python -m efface.cli attack --tactic backtranslate --intensity 1 --input results/news-0001.json

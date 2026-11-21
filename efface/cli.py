@@ -46,6 +46,12 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "attack":
             command.add_argument("--tactic", default=None)
             command.add_argument("--intensity", type=float, default=1.0)
+        if name == "generate":
+            command.add_argument("--row", default="g1", help="generator row key")
+            command.add_argument("--prompts", default=None, help="prompt JSONL")
+            command.add_argument("--markllm-dir", default="~/MarkLLM")
+            command.add_argument("--seed", type=int, default=0)
+            command.add_argument("--limit", type=int, default=None)
     return parser
 
 
@@ -93,10 +99,63 @@ def _smoke() -> int:
     return 0
 
 
+def _build_generator(row: dict, args: argparse.Namespace):
+    """Factory kept separate so tests can substitute a fake backend."""
+    from efface.watermark import MarkLLMBackend, WatermarkGenerator
+
+    backend = MarkLLMBackend(
+        markllm_dir=args.markllm_dir,
+        model=row["model"],
+        revision=row.get("revision"),
+        key_seed=int(row.get("key_seed", 20261117)),
+    )
+    return WatermarkGenerator(backend)
+
+
+def _generate(args: argparse.Namespace) -> int:
+    from efface.config import load
+    from efface.watermark import generate_corpus, read_jsonl, write_jsonl
+
+    if not args.config or not args.prompts:
+        print("generate needs --config and --prompts", file=sys.stderr)
+        return 2
+    config = load(args.config)
+    try:
+        row = config["rows"][args.row]
+    except KeyError:
+        print(f"unknown generator row {args.row!r}", file=sys.stderr)
+        return 2
+
+    prompts = list(read_jsonl(args.prompts))
+    if args.limit is not None:
+        prompts = prompts[: args.limit]
+    if not prompts:
+        print(f"no prompts in {args.prompts}", file=sys.stderr)
+        return 2
+
+    output = args.output or f"results/corpus-{args.row}.jsonl"
+    count = write_jsonl(
+        generate_corpus(
+            prompts=prompts,
+            row=row,
+            generator=_build_generator(row, args),
+            config_path=args.config,
+            markllm_dir=args.markllm_dir,
+            model_revision=row.get("revision"),
+            seed=args.seed,
+        ),
+        output,
+    )
+    print(f"generate: wrote {count} records to {output}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "smoke":
         return _smoke()
+    if args.command == "generate":
+        return _generate(args)
     print(f"{args.command}: not implemented yet (planned in PLAN.md)", file=sys.stderr)
     return 2
 

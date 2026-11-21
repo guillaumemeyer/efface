@@ -7,5 +7,5 @@ def test_smoke_passes(capsys):
 
 
 def test_unimplemented_command_exits_two(capsys):
-    assert main(["generate"]) == 2
+    assert main(["attack"]) == 2
     assert "not implemented" in capsys.readouterr().err

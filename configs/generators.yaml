@@ -9,6 +9,7 @@ rows:
     temperature: 0.7
     top_p: 0.9
     keys: [3, 42, 1234]
+    key_seed: 20261117
   g2:
     model: Qwen/Qwen2.5-1.5B-Instruct
     family: qwen
@@ -17,4 +18,5 @@ rows:
     temperature: 0.7
     top_p: 0.9
     keys: [3, 42, 1234]
+    key_seed: 20261117
     status: provisional_until_w2_1

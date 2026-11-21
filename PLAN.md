@@ -134,7 +134,7 @@ W2.0 blocks W2.1. Attack scores computed before R1–R6 are in the preregistrati
   - [x] `S` is BERTScore + COMET in §7 and D6. BLEURT, MAUVE, and length ratio are reported columns. The COMET call is stated.
   - [x] Headroom margin, 57-pair screen, pass 3, and the R3 bound are in `configs/search.yaml`.
   - [x] Conclusion, checklist, README, and the abstract describe the protocol. Tests 50 passed, smoke 9 checks, lint clean, `tectonic` builds.
-- [ ] **W2.1** Generation adapter: one document per prompt per key, fixed seeds, revision pinned. Done when: `python -m efface.cli generate` writes a JSON record whose key id is the detection key.
+- [x] **W2.1** Generation adapter: one document per prompt per key, fixed seeds, revision pinned. Done 2026-11-21: `python -m efface.cli generate` wrote three records for one prompt, each carrying its key id, the MarkLLM commit, and the key derivation. A derived key scored 0.5559 against the 0.52 threshold. Per-document key arrays are D13.
 - [ ] **W2.2** Detector adapter: per-key p-value, score, batch mode, MarkLLM commit recorded. Done when: unit test on a fixture reproduces a stored p-value.
 - [ ] **W2.3** Attack interface: `apply(text, intensity, seed) -> text`, one module per tactic. Done when: all tactics share the interface; unknown tactic fails loudly.
 - [ ] **W2.4** Implement the 12 tactics, reusing `paraphrase`, `backtranslate`, `structural`, `humanize`, `chunk`, `mlm`. Done when: each tactic has a test, a recorded example, and a one-sentence operational difference from its published relative.

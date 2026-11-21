@@ -182,6 +182,24 @@ Estimated ablation cost: 7 rows over the held-out split is about 6,700
 document-attacks, roughly $45–$60 at Sonnet 5.5 list prices after the tokenizer
 allowance. Details in `docs/budget.md`.
 
+## D13 — Per-document keys under MarkLLM SynthID
+
+MarkLLM's SynthID keys the scheme from a fixed **array** of 30 integers in
+`config/SynthID.json`, and uses the whole array on every generation. A
+per-document key is therefore an array, not a scalar.
+
+- The record's `key` is an integer id. The array is derived as
+  `sha256("<key_seed>:<key>:<index>") mod 65536` for `index` in `0..29`.
+- `key_seed` is `20261117`, fixed in `configs/generators.yaml` and repeated in
+  the run manifest, which also records the derivation and the table size.
+- The adapter builds one SynthID instance per key array and shares the model,
+  so a run loads weights once.
+- The detector must rebuild the array from the record's `key` and the
+  manifest's `key_seed`; using a different array detects a different mark.
+
+Verified on 2026-11-21: `facebook/opt-1.3b`, key 3, score 0.5559 against the
+0.52 threshold after deriving the array this way.
+
 ## D12 — Estimand locks before the first attack score
 
 Added 2026-11-21, before any removal result exists. These supersede the earlier

@@ -46,6 +46,11 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "attack":
             command.add_argument("--tactic", default=None)
             command.add_argument("--intensity", type=float, default=1.0)
+        if name == "score":
+            command.add_argument("--alpha", type=float, default=0.05)
+            command.add_argument("--row", default="g1", help="generator row key")
+            command.add_argument("--markllm-dir", default="~/MarkLLM")
+            command.add_argument("--null", default=None, help="calibrated null JSON")
         if name == "generate":
             command.add_argument("--row", default="g1", help="generator row key")
             command.add_argument("--prompts", default=None, help="prompt JSONL")
@@ -84,6 +89,12 @@ def _smoke() -> int:
     checks += 1
 
     assert pareto_frontier([(1.0, 1.0), (0.5, 0.5), (1.0, 0.9)]) == [0]
+    checks += 1
+
+    from efface.detect import NullModel, pvalue_from_score
+
+    assert pvalue_from_score(0.55, 1000) < 0.05
+    assert NullModel.fit([(0.49, 1000), (0.51, 1000)]).mean == 0.5
     checks += 1
 
     search, holdout = split_documents([f"doc-{i}" for i in range(10)], fraction=0.6, seed=7)
@@ -150,12 +161,72 @@ def _generate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _build_detector(args: argparse.Namespace):
+    """Factory kept separate so tests can substitute a fake detector."""
+    from efface.config import load
+    from efface.watermark import MarkLLMBackend
+
+    config = load(args.config or "configs/generators.yaml")
+    row = config["rows"][args.row]
+    backend = MarkLLMBackend(
+        markllm_dir=args.markllm_dir,
+        model=row["model"],
+        revision=row.get("revision"),
+        key_seed=int(row.get("key_seed", 20261117)),
+    )
+    from efface.detect import MarkLLMDetector, NullModel
+
+    null = None
+    if getattr(args, "null", None):
+        import json
+        from pathlib import Path
+
+        data = json.loads(Path(args.null).read_text(encoding="utf-8"))
+        # Accept either the bare null or the calibration report that wraps it.
+        null = NullModel.from_dict(data.get("null", data))
+    return MarkLLMDetector(backend, null=null)
+
+
+def _score(args: argparse.Namespace) -> int:
+    from efface.evaluate import is_removed
+    from efface.watermark import read_jsonl, write_jsonl
+
+    if not args.input:
+        print("score needs --input", file=sys.stderr)
+        return 2
+    detector = _build_detector(args)
+
+    def results():
+        for record in read_jsonl(args.input):
+            score = detector.score(record["text"], int(record["key"]))
+            yield {
+                "doc_id": record["doc_id"],
+                "prompt_id": record.get("prompt_id"),
+                "domain": record.get("domain"),
+                "key": score.key,
+                "detector": score.detector,
+                "score": score.score,
+                "pvalue": score.pvalue,
+                "n_eff": score.n_eff,
+                "alpha": args.alpha,
+                "removed": is_removed(score.pvalue, alpha=args.alpha),
+                "manifest": record.get("manifest"),
+            }
+
+    output = args.output or "results/scores.jsonl"
+    count = write_jsonl(results(), output)
+    print(f"score: wrote {count} records to {output}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "smoke":
         return _smoke()
     if args.command == "generate":
         return _generate(args)
+    if args.command == "score":
+        return _score(args)
     print(f"{args.command}: not implemented yet (planned in PLAN.md)", file=sys.stderr)
     return 2
 

@@ -21,7 +21,7 @@ We answer the Machine Learning Reproducibility Checklist v2.0 \citep{pineau} for
 \paragraph{Shared code.}
 \begin{itemize}
   \item Dependency specification: yes, \texttt{pyproject.toml} with version ranges.
-  \item Evaluation code: partial; the statistics, split, strategy parser, and frontier helpers are in \texttt{efface/evaluate/} and \texttt{efface/search/}. Tactic modules, the detector adapter, and the three-pass search land with the first results.
+  \item Evaluation code: partial; the statistics, split, strategy parser, frontier helpers, generation adapter, detector adapter, and null calibration are in \texttt{efface/}. Tactic modules and the three-pass search land with the first results.
   \item Pretrained models: named in Table~\ref{tab:attackers}; the open-weight generator checkpoints are named, and revisions are recorded in each run manifest.
   \item README with a table of results and the command that produces each: partial; the README carries the reproduction table with commands marked as planned.
 \end{itemize}

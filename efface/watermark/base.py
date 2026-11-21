@@ -33,5 +33,6 @@ class GeneratedDocument:
     unwatermarked_text: str | None = None
 
 
+
 class Generator(Protocol):
     def generate(self, request: GenerationRequest) -> GeneratedDocument: ...

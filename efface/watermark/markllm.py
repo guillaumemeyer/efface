@@ -89,7 +89,7 @@ class MarkLLMBackend:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
         from utils.transformers_config import TransformersConfig
-        from watermark.synthid.synthid import SynthID
+        from watermark.synthid.synthid import SynthID, SynthIDConfig
 
         self._device = self.device or ("mps" if torch.backends.mps.is_available() else "cpu")
         self._tokenizer = AutoTokenizer.from_pretrained(self.model, revision=self.revision)
@@ -106,21 +106,31 @@ class MarkLLMBackend:
             temperature=0.7,
             top_p=0.9,
         )
-        self._config_class = TransformersConfig
+        self._config_class = SynthIDConfig
         self._transformers_config = config
         self._synthid_class = SynthID
         self._synthid_path = str(self.markllm_dir / "config" / "SynthID.json")
         self._torch = torch
         self._loaded = True
 
-    def _scheme_for(self, key: int) -> Any:
-        """One SynthID instance per key array; the model is shared."""
+    def scheme_for(self, key: int) -> Any:
+        """One SynthID instance per key array; the model is shared.
+
+        Loads the model on first use, so a detector can be handed a backend
+        without a separate warm-up call.
+        """
+        self._load()
         scheme = self._by_key.get(key)
         if scheme is None:
             keys = derive_keys(
                 seed=self.key_seed, key=key, table_size=self.table_size
             )
-            scheme = self._synthid_class(self._synthid_path, self._transformers_config, keys=keys)
+            # SynthID.__init__ drops **kwargs, so the key array is applied on
+            # the config object and the scheme is built from that config.
+            scheme_config = self._config_class(
+                self._synthid_path, self._transformers_config, keys=keys
+            )
+            scheme = self._synthid_class(scheme_config)
             self._by_key[key] = scheme
         return scheme
 
@@ -128,7 +138,7 @@ class MarkLLMBackend:
         self, prompt: str, *, key: int, seed: int, request: GenerationRequest
     ) -> str:
         self._load()
-        scheme = self._scheme_for(key)
+        scheme = self.scheme_for(key)
         config = scheme.config
         config.max_new_tokens = request.max_new_tokens
         config.temperature = request.temperature
@@ -137,6 +147,19 @@ class MarkLLMBackend:
         if self._device == "mps":
             self._torch.mps.manual_seed(seed)
         return scheme.generate_watermarked_text(prompt)
+
+    def generate_unwatermarked(
+        self, prompt: str, *, key: int, seed: int, request: GenerationRequest
+    ) -> str:
+        """Same model and decoding, no logits processor. For null calibration."""
+        self._load()
+        scheme = self.scheme_for(key)
+        config = scheme.config
+        config.max_new_tokens = request.max_new_tokens
+        self._torch.manual_seed(seed)
+        if self._device == "mps":
+            self._torch.mps.manual_seed(seed)
+        return scheme.generate_unwatermarked_text(prompt)
 
     def metadata(self) -> dict[str, Any]:
         return {

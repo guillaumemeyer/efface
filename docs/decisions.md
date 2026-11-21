@@ -131,19 +131,28 @@ MarkLLM returns a mean normalised g-value and compares it with a fixed
 threshold of 0.52. The paper's removal rule is defined at `alpha = 0.05`, so the
 harness derives a p-value rather than reusing that threshold.
 
-Under the unwatermarked null, the g-values are uniform over the sampling table,
-so the normalised mean score has expectation 0.5 and variance
-`1 / (12 * n_eff)`, where `n_eff` is the number of unmasked positions. The
-harness reports the one-sided normal p-value and validates its calibration on
-100 unwatermarked documents per generator row. If the empirical null is
-over-dispersed, the variance is estimated from that calibration set instead and
-the change is recorded here.
+Under the unwatermarked null each g-value is Bernoulli(1/2), so the mean score
+has expectation 0.5 and variance `1 / (4 * n_eff)`, where `n_eff` is the number
+of unmasked positions times the depth. The earlier `1 / (12 * n_eff)` was the
+variance of a continuous uniform draw and was corrected on 2026-11-21, before
+any removal result existed.
+
+**Calibration (2026-11-21).** A 60-document pilot on G1 found the analytic
+model mis-centred and over-dispersed: the unwatermarked mean score was 0.4978
+against the assumed 0.5, and the fitted variance scale was 0.0871 against the
+assumed 0.25. The split-half holdout false-positive rate at α = 0.05 was 0.000
+under the analytic null and 0.033 under the fitted null.
+Reported p-values therefore use a `NullModel` fitted to unwatermarked documents
+(`scripts/calibrate_null.py`), with the fit stored in every score record.
+Details and numbers are in `docs/detector-calibration.md`. The analytic null is
+the fallback when no calibration is supplied.
 
 Both operating points use that null. The per-document removal test takes its
-critical value from the normal null, and the corpus TPR at 1% FPR takes its
-threshold from the same distribution. The empirical 1% quantile of the
-calibration set is reported as a diagnostic; 100 negatives cannot pin a 1%
-threshold. The calibration set grows when the null is over-dispersed.
+critical value from it, and the corpus TPR at 1% FPR takes its threshold from
+the same distribution. The empirical 1% quantile of the calibration set is
+reported as a diagnostic; 100 negatives cannot pin a 1% threshold. The
+calibration set grows to at least 200 documents per row before the detection
+gate is read (W2.13).
 
 **Detection check before any attack table (added 2026-11-21).** On at least 200
 watermarked documents of at least 150 tokens per generator row, the observed
@@ -197,8 +206,14 @@ per-document key is therefore an array, not a scalar.
 - The detector must rebuild the array from the record's `key` and the
   manifest's `key_seed`; using a different array detects a different mark.
 
-Verified on 2026-11-21: `facebook/opt-1.3b`, key 3, score 0.5559 against the
-0.52 threshold after deriving the array this way.
+Verified on 2026-11-21: `facebook/opt-1.3b`, one prompt, keys 3, 42, and 1234
+score 0.5674, 0.5394, and 0.5586, so the three arrays are distinct marks. The
+keyed detection on the stored fixture is 0.5389 with 4,860 g-values.
+
+The first implementation passed the array as a keyword to `SynthID.__init__`,
+which drops `**kwargs`; every key then used the config file's fixed array and
+produced identical scores. The adapter now builds `SynthIDConfig` with the
+derived array and constructs the scheme from it.
 
 ## D12 — Estimand locks before the first attack score
 

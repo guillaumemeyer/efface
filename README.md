@@ -151,11 +151,12 @@ python -m efface.cli generate --config configs/generators.yaml \
 # 2. Apply one tactic to it
 python -m efface.cli attack --tactic backtranslate --intensity 1 --input results/news-0001.json
 
-# 3. Score removal and preservation
-python -m efface.cli score --detector markllm-synthid --keys 3 --input results/news-0001.attacked.json
+# 3. Score removal under each document's generating key
+python -m efface.cli score --input results/docs.jsonl \
+  --null results/null-g1.json --output results/scores.jsonl
 ```
 
-`score` writes a JSON record with the per-key p-values, the detector score, the semantic metrics, and the length ratio. The same record feeds the tables in the paper.
+`score` writes one record per document with the detector score, `n_eff`, the p-value, the null that produced it, the `removed` flag at α = 0.05, and the manifest inherited from generation. The same records feed the tables in the paper.
 
 ## Attack catalogue
 

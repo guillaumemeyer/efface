@@ -12,7 +12,7 @@ This paper closes that gap for the SynthID-Text class. We treat removal as a con
 \paragraph{Contributions.}
 \begin{itemize}
   \item A catalogue of thirteen rows: twelve removal tactics in four families and one control, each defined operationally, linked to the paper that introduced or evaluated it, and implemented behind one interface (\S\ref{sec:catalogue}).
-  \item A chain search that evaluates ordered compositions of up to three tactics under a semantic floor, with pruning that keeps the evaluation budget bounded (\S\ref{sec:search}).
+  \item A three-pass search over ordered chains of up to three tactics: a depth-one intensity map, a diverse beam of width $8$ with logged exclusions, and an intensity adjustment on the shortlist, under a semantic floor (\S\ref{sec:search}).
   \item An empirical frontier between removal and preservation across \ph{number} documents, \ph{number} generators, and \ph{number} domains, reported at two operating points (\S\ref{sec:results}).
 \end{itemize}
 

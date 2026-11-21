@@ -10,6 +10,9 @@ The detector is MarkLLM's implementation of the SynthID sampling-bias test. It h
 \paragraph{Semantic metrics are proxies.}
 BERTScore, BLEURT, COMET, and MAUVE each capture part of meaning and miss part of it. They are insensitive to some factual corruptions, they reward paraphrase that preserves entities and numbers, and they can be gamed by a tactic that keeps the opening sentence intact and rewrites the rest. We did not run a human rating study; it was out of scope for this artifact, so the automatic metrics are the only preservation evidence in this study. A reader who cares about a specific failure mode, such as a changed number or a dropped attribution, should read the per-metric table rather than the composite.
 
+\paragraph{Search exclusions.}
+The headroom rule and the order screen leave some chains unmeasured. Adding depth-one preservation losses overstates the cost of a second step; the margin of $0.10$ is what keeps a near-miss in the evaluated set. An order closed by the screen is a measured pair. The pair itself is scored, and only its extensions are skipped. The search log lists every skipped extension and the rule that skipped it.
+
 \paragraph{Composition compounds loss.}
 A chain that satisfies the floor on average can still fail badly on individual documents. We report the distribution of per-document scores, and we flag chains whose lower tail falls below the floor even when their mean does not. The same applies to length: a tactic that shortens text reduces the evidence available to the detector, and shortening is itself a change in content that the composite score may not penalise enough.
 

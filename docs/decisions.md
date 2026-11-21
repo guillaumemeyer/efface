@@ -96,6 +96,13 @@ compared in the same table. Per-metric values are always reported.
 τ is revised at most once, after the Week 2 pilot and before the main sweep. A
 revision is recorded in `PREREGISTRATION.md` as a dated deviation.
 
+On 2026-11-21 the chain search was refined into the three passes in
+`paper/sections/05-combination-search.tex`: operating intensities from the
+depth-1 map, a diverse beam, a headroom skip, an order screen of 57 pairs, and
+a one-step intensity adjustment on the shortlist. The floor, the beam width,
+the split, and the decision rule are unchanged. The deviation is recorded in
+`PREREGISTRATION.md`.
+
 ## D8 — Prompt sources
 
 Self-authored prompts for news writing, long-form question answering, and

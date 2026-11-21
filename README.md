@@ -184,13 +184,13 @@ Two properties of the catalogue matter for the results. First, the families diff
 
 A chain is an ordered tuple of up to three tactics, applied left to right. Order is part of the chain: paraphrase then back-translate yields a different document from back-translate then paraphrase, because each step conditions on the previous output.
 
-With 12 tactics and depth at most three, the ordered space has 12 + 144 + 1,728 = **1,884 chains** before intensities are considered. EFFACE narrows it with a beam search:
+With 12 tactics and depth at most three, the ordered space has 12 + 144 + 1,728 = **1,884 chains** at one intensity. Seven tactics have three intensity levels and five have one, so the crossed grid has 26 + 26² + 26³ = **18,278 cells**. The objective only needs the cells that sit on the preservation floor. EFFACE searches that surface in three passes:
 
-1. Score every tactic once at its default intensity.
-2. Extend each survivor with every tactic, rescore, keep the best `B` chains.
-3. Repeat to depth three.
-4. Drop chains below the semantic floor, and chains whose removal does not improve on their best prefix by more than the smallest detectable difference.
-5. Choose on the search split, report on the held-out split.
+1. Map every tactic at each swept intensity. The operating intensity is the admissible level with the highest removal.
+2. Extend a diverse beam of width 8 (four slots by removal, two by preservation headroom, two by the family of the last step). Skip an extension whose predicted preservation is below τ − 0.10, and do not extend an order screen of 57 pairs that misses the 0.05 removal margin. Drop a measured chain that misses the semantic floor or that same margin against its best prefix.
+3. On the top five chains and the best single, try the next stronger swept intensity and keep it only when the chain stays admissible and removal rises by at least 0.05.
+
+Choose on the search split, report on the held-out split. Every evaluated chain is scored on the full search split.
 
 The paper reports beam width, pruning margins, and the number of chains actually evaluated, so that the search cost is auditable. It also reports the marginal removal bought by the third step, since a pair that captures most of the achievable removal is the honest recommendation.
 

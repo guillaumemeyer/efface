@@ -50,6 +50,8 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# Installed agent skills ship their own helper scripts.
+extend-exclude = [".agents"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

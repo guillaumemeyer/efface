@@ -63,17 +63,21 @@ wording in the pivot instead of translating the source word for word.
 
 ## D6 — Metrics and composite
 
-| Metric | Tier | Normalisation |
+| Metric | Role | Normalisation |
 | --- | --- | --- |
-| BERTScore-F1 | A | Already in `[0, 1]` |
-| COMET | A | Clip to `[0, 1]` |
-| MAUVE | A | Already in `[0, 1]` |
-| Length ratio | A | Reported, not in the composite |
-| BLEURT | B | `(s + 1) / 2`, clipped to `[0, 1]` |
+| BERTScore-F1 | Selects: half of \(S\) | Already in `[0, 1]` |
+| COMET | Selects: half of \(S\) | Clip to `[0, 1]` |
+| BLEURT | Reported at Tier B | `(s + 1) / 2`, clipped to `[0, 1]` |
+| MAUVE | Reported | Already in `[0, 1]`; a set divergence, so no per-document value |
+| Length ratio | Reported | Attacked tokens over source tokens |
 
-The composite is the unweighted mean of the metrics available at the tier. A
-Tier A composite and a Tier B composite are different scales and are never
-compared in the same table. Per-metric values are always reported.
+The selecting composite is \(S = \tfrac{1}{2}(\text{BERTScore-F1} + \text{COMET})\).
+Only \(S\) defines τ and chooses the chain. BLEURT, MAUVE, and length ratio are
+reported beside \(S\) and never enter the constraint, so the recommendation
+does not move when a tier adds BLEURT. COMET is called with the source
+document on the source side, the attacked document as the hypothesis, and the
+watermarked source as the reference. The fraction of documents with \(S < \tau\)
+is reported for every recommended chain.
 
 ## D7 — Preregistered settings
 
@@ -86,8 +90,10 @@ compared in the same table. Per-metric values are always reported.
 | Maximum chain depth | 3 |
 | Search/holdout split | 60/40 by document, seed 20261117 |
 | Prompts per domain | 100 at Tier B |
-| Watermark keys per document | 3 |
-| Stochastic repetitions | 3 seeds |
+| Watermark keys per prompt | 3 |
+| Documents | One per prompt per key, each scored under its generating key |
+| Intervals and bootstrap | Prompt-clustered |
+| Stochastic repetitions | 3 seeds per document |
 | Minimum document length | 150 tokens |
 | Per-document α | 0.05 |
 | Corpus operating point | TPR at 1% FPR |
@@ -133,6 +139,17 @@ harness reports the one-sided normal p-value and validates its calibration on
 over-dispersed, the variance is estimated from that calibration set instead and
 the change is recorded here.
 
+Both operating points use that null. The per-document removal test takes its
+critical value from the normal null, and the corpus TPR at 1% FPR takes its
+threshold from the same distribution. The empirical 1% quantile of the
+calibration set is reported as a diagnostic; 100 negatives cannot pin a 1%
+threshold. The calibration set grows when the null is over-dispersed.
+
+**Detection check before any attack table (added 2026-11-21).** On at least 200
+watermarked documents of at least 150 tokens per generator row, the observed
+detection rate at α = 0.05 must be at least 0.80 and its Wilson lower bound at
+least 0.70. A row that misses stops its attack sweep.
+
 ## D11 — Attacker models
 
 | Role | Search sweep | Second-attacker ablation |
@@ -164,6 +181,21 @@ Rules:
 Estimated ablation cost: 7 rows over the held-out split is about 6,700
 document-attacks, roughly $45–$60 at Sonnet 5.5 list prices after the tokenizer
 allowance. Details in `docs/budget.md`.
+
+## D12 — Estimand locks before the first attack score
+
+Added 2026-11-21, before any removal result exists. These supersede the earlier
+wording of D6 and D7 where the two differ, and they change no collected number
+because none has been collected.
+
+| ID | Lock |
+| --- | --- |
+| R1 | A document is generated under one key and scored under that key. It is removed when that p-value exceeds 0.05. Three keys produce three documents that share a prompt; intervals and the paired bootstrap resample prompts, and power is stated in prompts. All-three-keys-miss is a secondary table |
+| R2 | \(S\), the selecting composite, is the mean of BERTScore-F1 and clipped COMET (D6). BLEURT, MAUVE, and length ratio are reported and stay out of τ |
+| R3 | The detection check in D10 gates every attack table |
+| R4 | The headroom rule and the beam are budget rules whose error is measured: 30 skipped extensions or 10% of refusals, whichever is smaller, plus 20 off-beam pairs. Both rates enter §5 and §7 |
+| R5 | Catalogue rows name the closest published relative in the Source column and state their operational difference. Adaptive paraphrasers, cross-lingual summarization removal, and copy-paste mixing are listed as attacks the search does not run |
+| R6 | Both operating points use the parametric null from D10; the empirical 1% quantile is a diagnostic |
 
 ## Gate G1
 

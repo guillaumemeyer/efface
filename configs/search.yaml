@@ -13,6 +13,31 @@ repetitions: 3
 min_document_tokens: 150
 multiplicity: holm
 
+# Pass 1..3 (paper §5). These are the budget rules whose error the audits measure.
+operating_intensity: highest_removal_within_tolerance
+headroom_margin: 0.10
+order_screen:
+  pairs: 57
+  local_edits: [synonym_substitution, random_edits, typo_noise, mlm_infill, style_normalisation]
+  full_stream: [document_rewrite, backtranslate_multi, crosslingual_generation, regeneration]
+  self_chain: [document_rewrite, backtranslate_multi, crosslingual_generation, regeneration, backtranslate_single]
+  margin: 0.05
+shortlist_size: 5
+shortlist_intensity_step: 0.05
+
+# Audits (R4). Samples of the chains the budget rules refuse.
+audits:
+  skipped_extension_sample: 30
+  skipped_extension_fraction: 0.10
+  off_beam_pairs: 20
+
+# Predeclared detection check (preregistration §6a, R3). No attack table before it passes.
+detection:
+  min_documents: 200
+  min_document_tokens: 150
+  observed_tpr_floor: 0.80
+  wilson_lower_bound: 0.70
+
 cost:
   api_cap_usd: 600
   chars_per_token: 4.0

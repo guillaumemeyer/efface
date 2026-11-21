@@ -2,12 +2,14 @@
 
 Definitions used throughout the paper:
 
-- A document is removed when the detector fails to reject the unwatermarked
-  null under every watermark key at level ``alpha``.
-- The removal rate is the mean of that indicator, with a Wilson interval.
+- A document is generated under one key and scored under that key. It is
+  removed when the detector fails to reject the unwatermarked null at level
+  ``alpha``.
+- The removal rate is the document mean, with a prompt-clustered bootstrap
+  interval and a document-level Wilson interval beside it.
 - The residual true-positive rate is measured on attacked watermarked documents
-  at a threshold calibrated to a fixed false-positive rate on unwatermarked
-  documents. Higher values mean the mark is still detectable.
+  at a threshold read from the parametric unwatermarked null at a fixed
+  false-positive rate. Higher values mean the mark is still detectable.
 
 Adapted from ``watermarks-remover`` (MIT): rank-based AUROC with tie handling.
 """
@@ -62,11 +64,133 @@ def removal_rate(removed: Sequence[bool], z: float = Z95) -> Rate:
     return Rate(value=k / n, low=low, high=high, n=n)
 
 
-def removed_from_pvalues(pvalues: Sequence[float], alpha: float = 0.05) -> bool:
-    """True when every key fails to reject the null, i.e. no key detects the mark."""
-    if not pvalues:
-        raise ValueError("at least one key is required")
-    return min(pvalues) > alpha
+def is_removed(pvalue: float, alpha: float = 0.05) -> bool:
+    """True when the detector fails to reject the null under the generating key.
+
+    A document carries one key, the key used to generate it, so removal is a
+    single test. Requiring every key to miss is a prompt-level summary and
+    lives beside this bit, not in it.
+    """
+    if not 0.0 <= pvalue <= 1.0:
+        raise ValueError("pvalue must lie in [0, 1]")
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must lie in (0, 1)")
+    return pvalue > alpha
+
+
+def clustered_rate(
+    removed: Sequence[bool],
+    clusters: Sequence[str],
+    *,
+    n_resamples: int = 10_000,
+    seed: int = 0,
+    confidence: float = 0.95,
+) -> Rate:
+    """Removal rate with a prompt-clustered bootstrap interval.
+
+    The three documents that share a prompt are repeated measurements of that
+    prompt, so resampling documents would understate the interval. Clusters
+    are resampled whole, and the point estimate stays the document mean.
+    """
+    if len(removed) != len(clusters):
+        raise ValueError("removed and clusters must have the same length")
+    if not removed:
+        raise ValueError("removed must not be empty")
+    by_cluster: dict[str, list[bool]] = {}
+    for flag, cluster in zip(removed, clusters, strict=True):
+        by_cluster.setdefault(cluster, []).append(flag)
+    names = sorted(by_cluster)
+    rng = random.Random(seed)
+    estimates = []
+    for _ in range(n_resamples):
+        total = 0
+        count = 0
+        for _ in names:
+            members = by_cluster[names[rng.randrange(len(names))]]
+            total += sum(1 for flag in members if flag)
+            count += len(members)
+        estimates.append(total / count)
+    estimates.sort()
+    alpha = (1.0 - confidence) / 2.0
+    low = estimates[int(alpha * n_resamples)]
+    high = estimates[min(n_resamples - 1, int((1.0 - alpha) * n_resamples))]
+    value = sum(1 for flag in removed if flag) / len(removed)
+    return Rate(value=value, low=low, high=high, n=len(removed))
+
+
+def normal_quantile(p: float) -> float:
+    """Inverse standard normal CDF, for the parametric null threshold."""
+    if not 0.0 < p < 1.0:
+        raise ValueError("p must lie in (0, 1)")
+    # Acklam's rational approximation; absolute error below 1.15e-9.
+    a = (-3.969683028665376e01, 2.209460984245205e02, -2.759285104469687e02,
+         1.383577518672690e02, -3.066479806614716e01, 2.506628277459239e00)
+    b = (-5.447609879822406e01, 1.615858368580409e02, -1.556989798598866e02,
+         6.680131188771972e01, -1.328068155288572e01)
+    c = (-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e00,
+         -2.549732539343734e00, 4.374664141464968e00, 2.938163982698783e00)
+    d = (7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e00,
+         3.754408661907416e00)
+    plow, phigh = 0.02425, 1.0 - 0.02425
+    if p < plow:
+        q = math.sqrt(-2.0 * math.log(p))
+        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / (
+            (((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1.0
+        )
+    if p > phigh:
+        q = math.sqrt(-2.0 * math.log(1.0 - p))
+        return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / (
+            (((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1.0
+        )
+    q = p - 0.5
+    r = q * q
+    return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (
+        ((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1.0
+    )
+
+
+def tpr_at_fpr_parametric(
+    positives: Sequence[float],
+    negatives: Sequence[float],
+    fpr: float = 0.01,
+) -> float:
+    """TPR at a false-positive rate set by the normal null.
+
+    ``negatives`` are the calibration documents, used to estimate the null mean
+    and standard deviation. The 1% threshold is the matching normal quantile of
+    that null, which is far more stable than an empirical quantile of a small
+    calibration set. Scores are oriented so that higher means more watermarked.
+    """
+    if not positives or not negatives:
+        raise ValueError("both classes must be non-empty")
+    if not 0.0 < fpr < 1.0:
+        raise ValueError("fpr must lie in (0, 1)")
+    n = len(negatives)
+    mean = sum(negatives) / n
+    variance = sum((value - mean) ** 2 for value in negatives) / (n - 1)
+    if variance <= 0.0:
+        raise ValueError("negatives must vary to calibrate a null")
+    threshold = mean + normal_quantile(1.0 - fpr) * math.sqrt(variance)
+    return sum(1 for score in positives if score >= threshold) / len(positives)
+
+
+def detection_check_pass(
+    detected: Sequence[bool],
+    *,
+    observed_floor: float = 0.80,
+    lower_bound_floor: float = 0.70,
+) -> bool:
+    """Predeclared gate from preregistration §6a.
+
+    The observed detection rate and its Wilson lower bound must both clear
+    their floors before an attack table is built for a generator row.
+    """
+    if not detected:
+        raise ValueError("detected must not be empty")
+    matched = sum(1 for flag in detected if flag)
+    rate = matched / len(detected)
+    low, _ = wilson_interval(matched, len(detected))
+    return rate >= observed_floor and low >= lower_bound_floor
 
 
 def _average_ranks(values: Sequence[float]) -> list[float]:

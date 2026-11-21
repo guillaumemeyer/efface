@@ -12,7 +12,7 @@ This repository holds the paper and the code for **EFFACE**, a study of how much
 
 ## Status
 
-> **Draft, preprint in preparation.** The paper source is in [`paper/`](paper/). Every number in the paper and in this README is a `TODO` placeholder until the runs land. The code interface shown below is the planned one; no package has been released yet. Results will be replaced with held-out numbers, and a DOI will be added to the citation block.
+> **Draft, preprint in preparation.** The paper source is in [`paper/`](paper/). Every number in the paper and in this README is a `TODO` placeholder until the runs land. At this commit the paper is a protocol: it specifies the estimand, the search, and the detection gate, and it reports no removal result. The code interface shown below is the planned one. Results will be replaced with held-out numbers, and a DOI will be added to the citation block.
 
 Working documents: [`PLAN.md`](PLAN.md) for the task list, [`docs/decisions.md`](docs/decisions.md) for the locked design choices, and [`PREREGISTRATION.md`](PREREGISTRATION.md) for the frozen analysis protocol.
 
@@ -227,14 +227,15 @@ Data:
 | Creative writing | TODO | TODO | TODO |
 | MarkMyWords tasks | Piet et al. 2025 | TODO | TODO |
 
-Fixed settings: TODO temperature, top-p, and maximum length per generator; three independent watermark keys per document; a fixed seed list per stochastic tactic; documents below a minimum length discarded and counted. All of these live in `configs/` and are restated in Appendix B of the paper.
+Fixed settings: TODO temperature, top-p, and maximum length per generator; three watermark keys per prompt, with each document scored under its generating key; a fixed seed list per stochastic tactic; documents below a minimum length discarded and counted. All of these live in `configs/` and are restated in Appendix B of the paper.
 
 ## Metrics and decision rule
 
 Removal:
 
-- **Per-document removal rate** at `α = 0.05`: the fraction of documents where the same-config detector fails to reject the unwatermarked null under every one of the three keys, with a 95% Wilson interval.
-- **TPR at 1% FPR**: the corpus-level true-positive rate of the detector at a fixed false-positive rate, computed over the pooled attacked and unattacked sets.
+- **Per-document removal rate** at `α = 0.05`: the fraction of documents where the same-config detector fails to reject the unwatermarked null under the key that generated the document, with a 95% prompt-clustered bootstrap interval and a document-level Wilson interval beside it.
+- **TPR at 1% FPR**: the corpus-level true-positive rate of the detector at a false-positive rate read from the parametric unwatermarked null, computed over the pooled attacked and unattacked sets.
+- **Detection check**: before any attack table, each generator row must show a detection rate of at least 0.80 at `α = 0.05`, with a Wilson lower bound of at least 0.70, on at least 200 documents.
 
 Preservation:
 
@@ -244,7 +245,7 @@ Preservation:
 - **MAUVE** for distributional closeness between attacked and unattacked sets;
 - **Length ratio**, because a tactic that shortens a document can inflate similarity scores.
 
-The composite preservation score is the unweighted mean of the four automatic metrics, normalised to `[0, 1]`. Per-metric values are reported so the composite can be reweighted. The semantic floor `τ` is fixed before the search and reported with every recommendation, along with results at `τ ± 0.05`.
+The selecting preservation score `S` is the unweighted mean of BERTScore-F1 and COMET, normalised to `[0, 1]`. BLEURT, MAUVE, and length ratio are reported on the same documents and stay out of the constraint, so a tier change cannot move which chain wins. Per-metric values are reported so the composite can be reweighted. The semantic floor `τ` is fixed before the search and reported with every recommendation, along with results at `τ ± 0.05` and the fraction of documents below the floor.
 
 ## Results
 

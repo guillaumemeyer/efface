@@ -12,9 +12,11 @@ import sys
 from efface import __version__
 from efface.evaluate import (
     auroc,
+    clustered_rate,
+    detection_check_pass,
+    is_removed,
     paired_bootstrap_diff,
     removal_rate,
-    removed_from_pvalues,
     tpr_at_fpr,
     wilson_interval,
 )
@@ -58,8 +60,10 @@ def _smoke() -> int:
     assert rate.n == 10 and rate.value == 0.8
     checks += 1
 
-    assert removed_from_pvalues([0.31, 0.42, 0.07]) is True
-    assert removed_from_pvalues([0.01, 0.42, 0.07]) is False
+    assert is_removed(0.31) is True
+    assert is_removed(0.01) is False
+    assert clustered_rate([True, True, False], ["p1", "p2", "p3"], n_resamples=200).n == 3
+    assert detection_check_pass([True] * 19 + [False]) is True
     checks += 1
 
     assert auroc([2.0, 3.0], [1.0]) == 1.0

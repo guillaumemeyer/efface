@@ -15,11 +15,14 @@ An attack chain is an ordered tuple $T = (t^{(1)}, \dots, t^{(K)})$ with $K \le 
 Order matters. A paraphrase followed by a round trip yields a different document than a round trip followed by a paraphrase, because each step conditions on the output of the previous one. We therefore treat chains as ordered and search over ordered tuples.
 
 \paragraph{Removal.}
-For a document $x$ and a key set $K = \{k_1, \dots, k_L\}$ of independent keys, define the document as removed when the mark fails to be detected under every key at level $\alpha$:
+A document is generated under one key $k^\star$ and scored under that key:
 \begin{equation}
-  \mathrm{removed}_\alpha(x) = \mathbf{1}\!\left[\min_{k \in K} p_k(x) > \alpha \right].
+  \mathrm{removed}_\alpha(x) = \mathbf{1}\!\left[ p_{k^\star}(x) > \alpha \right].
+  \label{eq:removed}
 \end{equation}
-Two summaries follow. The \emph{removal rate} is the mean of $\mathrm{removed}_\alpha$ over the evaluation set, reported with a Wilson interval. The \emph{corpus operating point} is the true-positive rate at a $1\%$ false-positive rate. Positives are watermarked documents, attacked or not; negatives are unwatermarked documents. The threshold is the highest detector score at which the negative false-positive rate does not exceed $1\%$. We report both, because a per-document threshold and a corpus-level rate answer different questions: the first asks whether this document still carries a mark, the second asks what a detector tuned for a fixed error budget would conclude.
+This is the detector's own question, asked with the key the mark was written with. The scheme draws three keys per prompt, so a prompt yields three documents. Those documents share everything except the key, so they are repeated measurements of the prompt rather than independent trials. The \emph{removal rate} is the mean of $\mathrm{removed}_\alpha$ over documents; its interval is a prompt-clustered bootstrap, and a document-level Wilson interval is reported beside it. A prompt-level summary that requires all three keys to miss appears as a secondary table.
+
+The \emph{corpus operating point} is the true-positive rate at a $1\%$ false-positive rate. Positives are watermarked documents, attacked or not; negatives are unwatermarked documents. The threshold comes from the unwatermarked null of the scheme's test, standardised as in \S\ref{sec:setup}, rather than from the empirical quantile of a small negative set. We report both summaries, because a per-document threshold and a corpus-level rate answer different questions: the first asks whether this document still carries a mark, the second asks what a detector tuned for a fixed error budget would conclude.
 
 \paragraph{Preservation.}
 Let $S(x, T(x))$ be a semantic-preservation score in $[0,1]$, aggregated from the metrics in \S\ref{sec:metrics}. The floor $\tau$ is fixed before the search and reported with every result. A chain that falls below $\tau$ is inadmissible, whatever its removal rate.
@@ -32,7 +35,7 @@ The problem we study is
   \mathbb{E}_{x}\left[S(x, T(x))\right] \ge \tau ,
   \label{eq:objective}
 \end{equation}
-where $\mathcal{T}_{\le 3}$ is the set of ordered chains of length at most three drawn from $\mathcal{A}$. The constraint is enforced on the mean score; for every chain we recommend we also report the fraction of documents that fall below $\tau$. Equation~\ref{eq:objective} makes the trade-off explicit and prevents the degenerate answer, which is to apply the most destructive transformation available.
+where $\mathcal{T}_{\le 3}$ is the set of ordered chains of length at most three drawn from $\mathcal{A}$, and $S$ is the document-level composite defined in \S\ref{sec:metrics}. The constraint is enforced on the mean score; for every chain we recommend we also report the fraction of documents that fall below $\tau$. Equation~\ref{eq:objective} makes the trade-off explicit and prevents the degenerate answer, which is to apply the most destructive transformation available.
 
 \paragraph{Why a floor is necessary.}
 \citet{sand} show that for any watermark occupying a small share of the space of high-quality responses, a quality-oracle random walk reaches an unmarked output. The construction needs a quality oracle and enough mixing steps, and it degrades quality to the extent that the walk is imperfect. A study that reports removal without a preservation constraint therefore measures the quality of the attacker's oracle as much as the robustness of the scheme. Fixing $\tau$ and reporting the frontier around it keeps the comparison meaningful.
